@@ -15,9 +15,9 @@ Namespace ShanXingTech.Cryptography
         ''' 默认编码方式为Unicode
         ''' </summary>
         ''' <returns></returns>
-        Public Property Encoding As Text.Encoding = Text.Encoding.Unicode
+        Public ReadOnly Property Encoding As Text.Encoding
 
-        Private tripleDes As New TripleDESCryptoServiceProvider
+        Private ReadOnly m_TripleDes As TripleDESCryptoServiceProvider
         Private Const HexKeyLength As Integer = 4
         Private Const ValidDateLength As Integer = 10
         Private Const ValidDateFormat As String = "yyyy-MM-dd"
@@ -30,14 +30,18 @@ Namespace ShanXingTech.Cryptography
         ''' <param name="key">密钥 控制 EncryptString 和 DecryptString 方法。</param>
         Sub New(ByVal key As String)
             ' Initialize the crypto provider.
-            tripleDes.Key = TruncateHash(key, tripleDes.KeySize \ 8)
-            tripleDes.IV = TruncateHash(String.Empty, tripleDes.BlockSize \ 8)
+            m_TripleDes = New TripleDESCryptoServiceProvider
+            m_TripleDes.Key = TruncateHash(key, m_TripleDes.KeySize \ 8)
+            m_TripleDes.IV = TruncateHash(String.Empty, m_TripleDes.BlockSize \ 8)
+
+            Me.Encoding = Text.Encoding.Unicode
         End Sub
 
         Sub New(ByVal key As String， ByVal encoding As Text.Encoding)
             ' Initialize the crypto provider.
-            tripleDes.Key = TruncateHash(key, tripleDes.KeySize \ 8)
-            tripleDes.IV = TruncateHash(String.Empty, tripleDes.BlockSize \ 8)
+            m_TripleDes = New TripleDESCryptoServiceProvider
+            m_TripleDes.Key = TruncateHash(key, m_TripleDes.KeySize \ 8)
+            m_TripleDes.IV = TruncateHash(String.Empty, m_TripleDes.BlockSize \ 8)
 
             Me.Encoding = encoding
         End Sub
@@ -81,7 +85,7 @@ Namespace ShanXingTech.Cryptography
                 Dim ms As New System.IO.MemoryStream
                 ' Create the encoder to write to the stream.
                 Using encStream As New CryptoStream(ms,
-                                                  tripleDes.CreateEncryptor(),
+                                                  m_TripleDes.CreateEncryptor(),
                                                   CryptoStreamMode.Write)
 
                     ' Use the crypto stream to write the byte array to the stream.
@@ -112,7 +116,7 @@ Namespace ShanXingTech.Cryptography
                 Dim ms As New System.IO.MemoryStream
                 ' Create the decoder to write to the stream.
                 Using decStream As New CryptoStream(ms,
-                                                  tripleDes.CreateDecryptor(),
+                                                  m_TripleDes.CreateDecryptor(),
                                                   CryptoStreamMode.Write)
 
 
@@ -234,12 +238,9 @@ Namespace ShanXingTech.Cryptography
 
             If disposing Then
                 ' TODO: 释放托管资源(托管对象)。
-                If tripleDes IsNot Nothing Then
-                    tripleDes.Dispose()
-                    tripleDes = Nothing
+                If m_TripleDes IsNot Nothing Then
+                    m_TripleDes.Dispose()
                 End If
-
-                Encoding = Nothing
             End If
 
             ' TODO: 释放未托管资源(未托管对象)并在以下内容中替代 Finalize()。
