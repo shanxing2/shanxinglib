@@ -8,6 +8,7 @@
 *.suo
 *.user
 *.userosscache
+*.sln
 *.sln.docstates
 
 # User-specific files (MonoDevelop/Xamarin Studio)
@@ -338,3 +339,6 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+
+/需求文档

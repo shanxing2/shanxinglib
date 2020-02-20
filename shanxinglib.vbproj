@@ -1,0 +1,231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6B546CD6-6940-4B7D-BF58-0D5E84C67F90}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>
+    </RootNamespace>
+    <AssemblyName>shanxinglib</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MyType>Windows</MyType>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>shanxinglib.xml</DocumentationFile>
+    <NoWarn>42017,42018,42019,42030,42032,42036,42104,42108,42109</NoWarn>
+    <WarningsAsErrors>41999,42016,42020,42021,42022</WarningsAsErrors>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <Optimize>false</Optimize>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RegisterForComInterop>false</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>shanxinglib.xml</DocumentationFile>
+    <NoWarn>42017,42018,42019,42030,42032,42036,42104,42108,42109</NoWarn>
+    <WarningsAsErrors>41999,42016,42020,42021,42022</WarningsAsErrors>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RegisterForComInterop>false</RegisterForComInterop>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionExplicit>On</OptionExplicit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionCompare>Binary</OptionCompare>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>Off</OptionStrict>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>ShanXingTech.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.AspNet.WebApi.Client.5.2.7\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Class\Conf.vb" />
+    <Compile Include="Class\Cryptography\RegistSimple.vb" />
+    <Compile Include="Class\Cryptography\AesSimple.vb" />
+    <Compile Include="Class\Cryptography\TripleDesDESSimple.vb" />
+    <Compile Include="Class\Exceptions\Exceptions.vb" />
+    <Compile Include="Class\IO\Directory.vb" />
+    <Compile Include="Class\IO\EncodingType.vb" />
+    <Compile Include="Class\IO\EnumDefine\CodePage.vb" />
+    <Compile Include="Class\IO\EnumDefine\ExcelColumnDataType.vb" />
+    <Compile Include="Class\IO\EnumDefine\FileFilter.vb" />
+    <Compile Include="Class\IO\EnumDefine\FileNameMode.vb" />
+    <Compile Include="Class\IO\EnumDefine\HDRMode.vb" />
+    <Compile Include="Class\IO\ExcelEngine.vb" />
+    <Compile Include="Class\IO\ExportExcelFileInfo.vb" />
+    <Compile Include="Class\IO\FileConverter.vb" />
+    <Compile Include="Class\IO\File.vb" />
+    <Compile Include="Class\IO\FileContentType.vb" />
+    <Compile Include="Class\IO\PathHelper.vb" />
+    <Compile Include="Class\IO\Reader.vb" />
+    <Compile Include="Class\IO\Writer.vb" />
+    <Compile Include="Class\Media\MciStatus.vb" />
+    <Compile Include="Class\Media\MediaType.vb" />
+    <Compile Include="Class\NET\DownloadResponse.vb" />
+    <Compile Include="Class\NET\EnumDefine\HttpMethod.vb" />
+    <Compile Include="Class\NET\EnumDefine\UploadMode.vb" />
+    <Compile Include="Class\NET\Event\DownloadFileCompletedEventArgs.vb" />
+    <Compile Include="Class\NET\Event\DownloadProgressChangedEventArgs.vb" />
+    <Compile Include="Class\NET\Event\UploadFileCompletedEventArgs.vb" />
+    <Compile Include="Class\NET\Event\UploadProgressChangedEventArgs.vb" />
+    <Compile Include="Class\NET\GBKCompatibleHanlder.vb" />
+    <Compile Include="Class\NET\HeadResponse.vb" />
+    <Compile Include="Class\NET\HttpAsync.vb" />
+    <Compile Include="Class\NET\HttpResponse.vb" />
+    <Compile Include="Class\NET\IPHelper.vb" />
+    <Compile Include="Class\IO\Logger.vb" />
+    <Compile Include="Class\Media\Mp3Player.vb" />
+    <Compile Include="Class\NET\HttpSync.vb" />
+    <Compile Include="Class\NET\BaiduNetdisk.vb" />
+    <Compile Include="Class\NET\NetHelper.vb" />
+    <Compile Include="Class\NET\UploadInfo.vb" />
+    <Compile Include="Class\Win32API\EnumDefines\FlashWindow.vb" />
+    <Compile Include="Class\Win32API\EnumDefines\MouseEventFlags.vb" />
+    <Compile Include="Class\Win32API\StructureDefines\FLASHWINFO.vb" />
+    <Compile Include="Class\Windows\Process.vb" />
+    <Compile Include="Class\Text.vb" />
+    <Compile Include="Class\Win32API\EnumDefines\SnapshotFlags.vb" />
+    <Compile Include="Class\Win32API\ExternDll.vb" />
+    <Compile Include="Class\Win32API\NtModuleInfo.vb" />
+    <Compile Include="Class\Win32API\StructureDefines\MODULEENTRY32.vb" />
+    <Compile Include="Class\Windows\Windows2.vb" />
+    <Compile Include="Class\Win32API\StructureDefines\ComBoBoxStruct.vb" />
+    <Compile Include="Class\Win32API\ConstDefine.vb" />
+    <Compile Include="Class\Win32API\StructureDefines\CopyDataStruct.vb" />
+    <Compile Include="Class\Win32API\EnumDefines\FsModifiers.vb" />
+    <Compile Include="Class\Win32API\EnumDefines\INTERNETFEATURELIST.vb" />
+    <Compile Include="Class\Win32API\EnumDefines\WindowPositions.vb" />
+    <Compile Include="Class\Win32API\EnumDefines\WindowCommand.vb" />
+    <Compile Include="Class\Win32API\EnumDefines\WindowLong.vb" />
+    <Compile Include="Class\Win32API\StructureDefines\RectStruct.vb" />
+    <Compile Include="Class\Win32API\UnsafeNativeMethods.vb" />
+    <Compile Include="Class\Work.vb" />
+    <Compile Include="Class\IO\Zip.vb" />
+    <Compile Include="EnumDefines\LoggerStatus.vb" />
+    <Compile Include="EnumDefines\RecognizeMode.vb" />
+    <Compile Include="EnumDefines\WorkStatus.vb" />
+    <Compile Include="Extensions\ArrayExtFunc.vb" />
+    <Compile Include="Extensions\EnumDefine\GlobleEnum.vb" />
+    <Compile Include="Extensions\ExtensionFunc.vb" />
+    <Compile Include="Extensions\IOExtFunc.vb" />
+    <Compile Include="Extensions\NetExtFunc.vb" />
+    <Compile Include="Extensions\StringExtFunc.vb" />
+    <Compile Include="Extensions\TimeExtFunc.vb" />
+    <Compile Include="Extensions\TypeConvertExtFunc.vb" />
+    <Compile Include="Extensions\UIExtFunc.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Class\InPtrHelper.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="packages.config" />
+    <None Include="README.md" />
+    <None Include="ShanXingTech.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Class\Misc\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".gitattributes" />
+    <Content Include=".gitignore" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
