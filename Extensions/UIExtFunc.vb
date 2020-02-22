@@ -431,10 +431,10 @@ Namespace ShanXingTech
                 m_EventDic.TryUpdate(eventFulllName, actionWhileMouseLeave, actionWhileMouseLeave)
             End If
 
-            AddHandler childForm.MouseLeave, AddressOf Form_MouseLeave
+            AddHandler childForm.MouseLeave, AddressOf Form_MouseLeaveHandle
         End Sub
 
-        Private Sub Form_MouseLeave(sender As Object, e As EventArgs)
+        Private Sub Form_MouseLeaveHandle(sender As Object, e As EventArgs)
             Dim form = DirectCast(sender, Form)
             If form Is Nothing Then Return
 
@@ -447,7 +447,7 @@ Namespace ShanXingTech
                 Dim eventFulllName = form.Name & ".MouseLeave"
                 Dim actionWhileMouseLeave As MouseLeaveAction
                 If m_EventDic.TryGetValue(eventFulllName, actionWhileMouseLeave) Then
-                    RemoveHandler form.MouseLeave, AddressOf Form_MouseLeave
+                    RemoveHandler form.MouseLeave, AddressOf Form_MouseLeaveHandle
 
                     If actionWhileMouseLeave = MouseLeaveAction.Hide Then
                         form.Visible = False
@@ -485,8 +485,8 @@ Namespace ShanXingTech
             control.Cursor = control.Cursor
             toolTip.Show(tips, control， 0, control.Cursor.Size.Height)
 
-            AddHandler control.MouseLeave, AddressOf ToolTipControl_MouseLeave
-            AddHandler control.LostFocus, AddressOf ToolTipControl_LostFocus
+            AddHandler control.MouseLeave, AddressOf ToolTipControl_MouseLeaveHandle
+            AddHandler control.LostFocus, AddressOf ToolTipControl_LostFocusHandle
         End Sub
 
         ''' <summary>
@@ -500,20 +500,20 @@ Namespace ShanXingTech
         Public Sub ShowTips(Of T As Control)(ByVal control As T, ByVal tips As String)
             m_toolTip.Show(tips, control， 0, control.Cursor.Size.Height)
 
-            AddHandler control.MouseLeave, AddressOf ToolTipControl_MouseLeave
+            AddHandler control.MouseLeave, AddressOf ToolTipControl_MouseLeaveHandle
         End Sub
 
         Private Sub ToolTipRemoveEventHandlerHandler(sender As Object, e As EventArgs)
             Dim control = DirectCast(sender, Control)
-            RemoveHandler control.MouseLeave, AddressOf ToolTipControl_MouseLeave
+            RemoveHandler control.MouseLeave, AddressOf ToolTipControl_MouseLeaveHandle
             m_toolTip.Hide(control)
         End Sub
 
-        Private Sub ToolTipControl_MouseLeave(sender As Object, e As EventArgs)
+        Private Sub ToolTipControl_MouseLeaveHandle(sender As Object, e As EventArgs)
             ToolTipRemoveEventHandlerHandler(sender, e)
         End Sub
 
-        Private Sub ToolTipControl_LostFocus(sender As Object, e As EventArgs)
+        Private Sub ToolTipControl_LostFocusHandle(sender As Object, e As EventArgs)
             ToolTipRemoveEventHandlerHandler(sender, e)
         End Sub
 
