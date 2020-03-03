@@ -361,7 +361,14 @@ Namespace ShanXingTech.Net2
 		''' <returns></returns>
 		Private Shared Function GetHttpWebRequest(ByVal url As String, ByVal method As HttpMethod, ByVal userAgent As String, ByRef cookies As CookieContainer) As HttpWebRequest
 			' 核心代码来自于 topsdk Top.Api.Reader.WebUtils
-			Dim request As HttpWebRequest = GetHttpWebRequest(url:=url, method:=method, cookies:=cookies, httpHeadersParam:=DefualtHttpHeadersParam, setSomeRequestHeader:=False)
+			Dim request As HttpWebRequest
+			If userAgent IsNot Nothing Then
+				Dim tempHttpHeaders = New Dictionary(Of HttpRequestHeader, String)(DefualtHttpHeadersParam)
+				tempHttpHeaders(HttpRequestHeader.UserAgent) = userAgent
+				request = GetHttpWebRequest(url:=url, method:=method, cookies:=cookies, httpHeadersParam:=tempHttpHeaders, setSomeRequestHeader:=False)
+			Else
+				request = GetHttpWebRequest(url:=url, method:=method, cookies:=cookies, httpHeadersParam:=DefualtHttpHeadersParam, setSomeRequestHeader:=False)
+			End If
 
 			Return request
 		End Function
@@ -404,8 +411,7 @@ Namespace ShanXingTech.Net2
 		''' <param name="cookies"></param>
 		''' <returns></returns>
 		Private Shared Function GetResponseAsString(ByVal request As HttpWebRequest, ByVal encoding As Text.Encoding, ByRef cookies As CookieContainer) As String
-
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
+			Dim responseContent As String
 			Dim response As HttpWebResponse = Nothing
 			Dim stream As Stream = Nothing
 
@@ -460,7 +466,7 @@ Namespace ShanXingTech.Net2
 		''' <param name="request"></param>
 		''' <returns></returns>
 		Private Shared Function GetResponseAsString(ByVal request As HttpWebRequest, ByRef cookies As CookieContainer) As String
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
+			Dim responseContent As String
 			Dim response As HttpWebResponse = Nothing
 			Dim stream As Stream = Nothing
 
@@ -518,11 +524,7 @@ Namespace ShanXingTech.Net2
 		''' <param name="encoding"></param>
 		''' <returns></returns>
 		Private Shared Function GetResponseAsString(ByVal request As HttpWebRequest, ByVal encoding As Text.Encoding) As String
-			Dim responseContent = HttpSync.NetWorkError
-
-			responseContent = GetResponseAsString(request, encoding, Nothing)
-
-			Return responseContent
+			Return GetResponseAsString(request, encoding, Nothing)
 		End Function
 
 		Private Shared Function TrustAllValidationCallback(sender As Object, certificate As X509Certificate, chain As X509Chain, errors As SslPolicyErrors) As Boolean
@@ -540,8 +542,6 @@ Namespace ShanXingTech.Net2
 		''' <param name="httpHeadersParam"></param>
 		''' <returns></returns>
 		Public Shared Function Post(ByVal url As String, ByVal postData As String, ByRef cookies As CookieContainer, ByVal encoding As Text.Encoding, ByVal httpHeadersParam As Dictionary(Of HttpRequestHeader, String)) As String
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
-
 			Dim webRequest As HttpWebRequest = GetHttpWebRequest(url:=url, method:=HttpMethod.POST, cookies:=cookies, httpHeadersParam:=httpHeadersParam, setSomeRequestHeader:=False)
 
 			If Not String.IsNullOrEmpty(postData) Then
@@ -559,12 +559,12 @@ Namespace ShanXingTech.Net2
 					Catch ex As Exception
 						Logger.WriteLine(ex)
 
-						Return HttpSync.NetWorkError
+						Return NetWorkError
 					End Try
 				End If
 			End If
 
-			responseContent = GetResponseAsString(webRequest, encoding, cookies)
+			Dim responseContent = GetResponseAsString(webRequest, encoding, cookies)
 
 			Return responseContent
 		End Function
@@ -580,7 +580,7 @@ Namespace ShanXingTech.Net2
 		''' <returns></returns>
 		Public Shared Function PostThreeTimeIfError(ByVal url As String, ByVal postData As String, ByRef cookies As CookieContainer, ByVal encoding As Text.Encoding, ByVal httpHeadersParam As Dictionary(Of HttpRequestHeader, String)) As String
 
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
+			Dim responseContent As String
 
 			' 最少执行一次，最多执行三次 一定程度上确保操作能成功
 			Dim getTime As Integer
@@ -592,40 +592,32 @@ Namespace ShanXingTech.Net2
 				' 没有联网并且获取网络信息错误的时候 马上退出 
 				' 不再浪费时间尝试
 				' 非 获取网络信息错误的时候也马上退出，不再进行第二次尝试
-				If (responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso Not NetHelper.IsConnected()) OrElse
-				Not responseContent Is HttpSync.NetWorkError.TryGetIntern Then
+				If (responseContent Is NetWorkError.TryGetIntern AndAlso Not NetHelper.IsConnectedToInternet()) OrElse
+				Not responseContent Is NetWorkError.TryGetIntern Then
 					Exit Do
-				ElseIf (responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso NetHelper.IsConnected()) OrElse responseContent.Length = 0 Then
+				ElseIf (responseContent Is NetWorkError.TryGetIntern AndAlso NetHelper.IsConnectedToInternet()) OrElse responseContent.Length = 0 Then
 					Continue Do
 				End If
-			Loop While responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso getTime < 3
+			Loop While responseContent Is NetWorkError.TryGetIntern AndAlso getTime < 3
 
 			Return responseContent
 		End Function
 
 		Public Shared Function UpLoadFile1(ByVal url As String, ByVal fileName As String, ByRef cookies As CookieContainer, ByVal encoding As Text.Encoding, ByVal httpHeadersParam As Dictionary(Of HttpRequestHeader, String)) As String
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
-
 			' 向指定地址发送请求
 			Dim request As HttpWebRequest = GetHttpWebRequest(url:=url, method:=HttpMethod.OPTIONS, cookies:=cookies, httpHeadersParam:=httpHeadersParam, setSomeRequestHeader:=False)
 
-			request.Headers.Set("Access-Control-Request-Method", "POST")
+			request.Headers.Set("Access-Control-Request-Method", HttpMethod.POST.ToString)
 			request.Headers.Set("Origin", "https://pan.baidu.com")
 
-			responseContent = GetResponseAsString(request, encoding)
+			Dim responseContent = GetResponseAsString(request, encoding)
 
 			Return responseContent
 		End Function
 
 
 		Public Shared Function UpLoadFile(ByVal url As String, ByVal fileName As String, ByRef cookies As CookieContainer, ByVal encoding As Text.Encoding, ByVal httpHeadersParam As Dictionary(Of HttpRequestHeader, String)) As (Success As Boolean, Message As String)
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
-
-			Dim request As HttpWebRequest = Nothing
-
-			'包体填充类
-			Dim mem_stream As MemoryStream = Nothing
-			Dim req_stream As Stream = Nothing
+			Dim request As HttpWebRequest
 
 			'请求响应类
 			Dim response As HttpWebResponse = Nothing
@@ -648,7 +640,7 @@ Namespace ShanXingTech.Net2
 			End If
 
 #Region "设置请求头"
-			request.Method = "POST"
+			request.Method = HttpMethod.POST.ToString
 
 #Region "设置cookie"
 			If cookies Is Nothing Then
@@ -700,8 +692,9 @@ Namespace ShanXingTech.Net2
 #End Region
 			request.ContentType = "multipart/form-data; boundary=---------------------------101843053213124"
 
+			'包体填充类
 			'设置请求体
-			mem_stream = New MemoryStream()
+			Dim mem_stream As MemoryStream = New MemoryStream()
 
 			'边界符
 			Dim boundary As String = "-----------------------------12046247044215"
@@ -733,13 +726,13 @@ Namespace ShanXingTech.Net2
 			mem_stream.Write(end_boundary, 0, end_boundary.Length)
 
 			request.ContentLength = mem_stream.Length
-			req_stream = request.GetRequestStream()
+			Dim req_stream As Stream = request.GetRequestStream()
 			mem_stream.Position = 0
 			Dim temp_buffer As Byte() = New Byte(CInt(mem_stream.Length) - 1) {}
 			mem_stream.Read(temp_buffer, 0, temp_buffer.Length)
 			req_stream.Write(temp_buffer, 0, temp_buffer.Length)
 
-			responseContent = GetResponseAsString(request, encoding, cookies)
+			Dim responseContent = GetResponseAsString(request, encoding, cookies)
 
 			Return (True, responseContent)
 		End Function
@@ -885,7 +878,7 @@ Namespace ShanXingTech.Net2
 		''' <returns></returns>
 		Public Shared Function GetHtmlThreeTimeIfError(ByVal url As String, ByVal encoding As Encoding, ByRef cookies As CookieContainer, ByVal httpHeadersParam As Dictionary(Of HttpRequestHeader, String)) As String
 
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
+			Dim responseContent As String
 
 			' 最少执行一次，最多执行三次 一定程度上确保操作能成功
 			Dim getTime As Integer
@@ -904,13 +897,13 @@ Namespace ShanXingTech.Net2
 				' 没有联网并且获取网络信息错误的时候 马上退出 
 				' 不再浪费时间尝试
 				' 非 获取网络信息错误的时候也马上退出，不再进行第二次尝试
-				If (responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso Not NetHelper.IsConnected()) OrElse
-				Not responseContent Is HttpSync.NetWorkError.TryGetIntern Then
+				If (responseContent Is NetWorkError.TryGetIntern AndAlso Not NetHelper.IsConnectedToInternet()) OrElse
+				Not responseContent Is NetWorkError.TryGetIntern Then
 					Exit Do
-				ElseIf (responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso NetHelper.IsConnected()) OrElse responseContent.Length = 0 Then
+				ElseIf (responseContent Is NetWorkError.TryGetIntern AndAlso NetHelper.IsConnectedToInternet()) OrElse responseContent.Length = 0 Then
 					Continue Do
 				End If
-			Loop While responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso getTime < 3
+			Loop While responseContent Is NetWorkError.TryGetIntern AndAlso getTime < 3
 
 			Return responseContent
 		End Function
@@ -924,11 +917,8 @@ Namespace ShanXingTech.Net2
 		''' <param name="setSomeRequestHeader">如果设置为True,则自动设置Accept-Encoding、Cache-Control、User-Agent三个请求头为工具内部默认值</param>
 		''' <returns></returns>
 		Public Shared Function GetHtmlThreeTimeIfError(ByVal url As String, ByRef cookies As CookieContainer, ByVal httpHeadersParam As Dictionary(Of HttpRequestHeader, String), ByVal setSomeRequestHeader As Boolean) As String
-
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
-			Dim response As HttpWebResponse = Nothing
-			Dim request As HttpWebRequest = Nothing
-			Dim stream As Stream = Nothing
+			Dim responseContent As String
+			Dim request As HttpWebRequest
 
 			' 最少执行一次，最多执行三次 一定程度上确保操作能成功
 			Dim getTime As Integer
@@ -946,13 +936,13 @@ Namespace ShanXingTech.Net2
 				' 没有联网并且获取网络信息错误的时候 马上退出 
 				' 不再浪费时间尝试
 				' 非 获取网络信息错误的时候也马上退出，不再进行第二次尝试
-				If (responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso Not NetHelper.IsConnected()) OrElse
-				Not responseContent Is HttpSync.NetWorkError.TryGetIntern Then
+				If (responseContent Is NetWorkError.TryGetIntern AndAlso Not NetHelper.IsConnectedToInternet()) OrElse
+				Not responseContent Is NetWorkError.TryGetIntern Then
 					Exit Do
-				ElseIf (responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso NetHelper.IsConnected()) OrElse responseContent.Length = 0 Then
+				ElseIf (responseContent Is NetWorkError.TryGetIntern AndAlso NetHelper.IsConnectedToInternet()) OrElse responseContent.Length = 0 Then
 					Continue Do
 				End If
-			Loop While responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso getTime < 3
+			Loop While responseContent Is NetWorkError.TryGetIntern AndAlso getTime < 3
 
 			Return responseContent
 		End Function
@@ -986,8 +976,7 @@ Namespace ShanXingTech.Net2
 		''' <param name="httpHeadersParam">各种请求头，cookie头也可以在这个参数里面设置</param>
 		''' <returns></returns>
 		Public Shared Function GetHtmlThreeTimeIfError(ByVal url As String, ByVal encoding As Encoding, ByVal httpHeadersParam As Dictionary(Of HttpRequestHeader, String)) As String
-
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
+			Dim responseContent As String
 
 			' 最少执行一次，最多执行三次 一定程度上确保操作能成功
 			Dim getTime As Integer
@@ -1004,13 +993,13 @@ Namespace ShanXingTech.Net2
 				' 没有联网并且获取网络信息错误的时候 马上退出 
 				' 不再浪费时间尝试
 				' 非 获取网络信息错误的时候也马上退出，不再进行第二次尝试
-				If (responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso Not NetHelper.IsConnected()) OrElse
-				Not responseContent Is HttpSync.NetWorkError.TryGetIntern Then
+				If (responseContent Is NetWorkError.TryGetIntern AndAlso Not NetHelper.IsConnectedToInternet()) OrElse
+				Not responseContent Is NetWorkError.TryGetIntern Then
 					Exit Do
-				ElseIf (responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso NetHelper.IsConnected()) OrElse responseContent.Length = 0 Then
+				ElseIf (responseContent Is NetWorkError.TryGetIntern AndAlso NetHelper.IsConnectedToInternet()) OrElse responseContent.Length = 0 Then
 					Continue Do
 				End If
-			Loop While responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso getTime < 3
+			Loop While responseContent Is NetWorkError.TryGetIntern AndAlso getTime < 3
 
 			Return responseContent
 		End Function
@@ -1022,7 +1011,7 @@ Namespace ShanXingTech.Net2
 		''' <param name="encoding">网页编码</param>
 		''' <returns></returns>
 		Public Shared Function GetHtmlThreeTimeIfError(ByVal url As String, ByVal encoding As Text.Encoding) As String
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
+			Dim responseContent As String
 
 			' 最少执行一次，最多执行三次 一定程度上确保操作能成功
 			Dim getTime As Integer
@@ -1040,13 +1029,13 @@ Namespace ShanXingTech.Net2
 				' 没有联网并且获取网络信息错误的时候 马上退出 
 				' 不再浪费时间尝试
 				' 非 获取网络信息错误的时候也马上退出，不再进行第二次尝试
-				If (responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso Not NetHelper.IsConnected()) OrElse
-				Not responseContent Is HttpSync.NetWorkError.TryGetIntern Then
+				If (responseContent Is NetWorkError.TryGetIntern AndAlso Not NetHelper.IsConnectedToInternet()) OrElse
+				Not responseContent Is NetWorkError.TryGetIntern Then
 					Exit Do
-				ElseIf (responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso NetHelper.IsConnected()) OrElse responseContent.Length = 0 Then
+				ElseIf (responseContent Is NetWorkError.TryGetIntern AndAlso NetHelper.IsConnectedToInternet()) OrElse responseContent.Length = 0 Then
 					Continue Do
 				End If
-			Loop While responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso getTime < 3
+			Loop While responseContent Is NetWorkError.TryGetIntern AndAlso getTime < 3
 
 			Return responseContent
 		End Function
@@ -1057,7 +1046,7 @@ Namespace ShanXingTech.Net2
 		''' <param name="url">链接</param>
 		''' <returns></returns>
 		Public Shared Function GetHtmlThreeTimeIfError(ByVal url As String) As String
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
+			Dim responseContent As String
 
 			' 最少执行一次，最多执行三次 一定程度上确保操作能成功
 			Dim getTime As Integer
@@ -1075,13 +1064,13 @@ Namespace ShanXingTech.Net2
 				' 没有联网并且获取网络信息错误的时候 马上退出 
 				' 不再浪费时间尝试
 				' 非 获取网络信息错误的时候也马上退出，不再进行第二次尝试
-				If (responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso Not NetHelper.IsConnected()) OrElse
-				Not responseContent Is HttpSync.NetWorkError.TryGetIntern Then
+				If (responseContent Is NetWorkError.TryGetIntern AndAlso Not NetHelper.IsConnectedToInternet()) OrElse
+				Not responseContent Is NetWorkError.TryGetIntern Then
 					Exit Do
-				ElseIf (responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso NetHelper.IsConnected()) OrElse responseContent.Length = 0 Then
+				ElseIf (responseContent Is NetWorkError.TryGetIntern AndAlso NetHelper.IsConnectedToInternet()) OrElse responseContent.Length = 0 Then
 					Continue Do
 				End If
-			Loop While responseContent Is HttpSync.NetWorkError.TryGetIntern AndAlso getTime < 3
+			Loop While responseContent Is NetWorkError.TryGetIntern AndAlso getTime < 3
 
 			Return responseContent
 		End Function
@@ -1095,7 +1084,7 @@ Namespace ShanXingTech.Net2
 		''' <param name="encoding">解码方式</param>
 		''' <returns></returns>
 		Public Shared Function GetHtml(ByVal url As String, ByVal encoding As Text.Encoding) As String
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
+			Dim responseContent As String
 
 			' 向指定地址发送请求
 			Dim request As HttpWebRequest = GetHttpWebRequest(url:=url, method:=HttpMethod.GET, userAgent:=UserAgent, cookies:=Nothing)
@@ -1114,7 +1103,7 @@ Namespace ShanXingTech.Net2
 		''' <param name="url">请求链接</param>
 		''' <returns></returns>
 		Public Shared Function GetHtml(ByVal url As String) As String
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
+			Dim responseContent As String
 
 			' 向指定地址发送请求
 			Dim request As HttpWebRequest = GetHttpWebRequest(url:=url, method:=HttpMethod.GET, userAgent:=UserAgent, cookies:=Nothing)
@@ -1135,7 +1124,7 @@ Namespace ShanXingTech.Net2
 		''' <param name="cookies">传入传出的Cookies</param>
 		''' <returns></returns>
 		Public Shared Function GetHtml(ByVal url As String， ByRef cookies As CookieContainer) As String
-			Dim responseContent As String = HttpSync.NetWorkError.TryGetIntern
+			Dim responseContent As String
 
 			' 向指定地址发送请求
 			Dim request As HttpWebRequest = GetHttpWebRequest(url:=url, method:=HttpMethod.GET, userAgent:=UserAgent, cookies:=cookies)

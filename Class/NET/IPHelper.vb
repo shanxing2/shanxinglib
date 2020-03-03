@@ -19,7 +19,7 @@ Namespace ShanXingTech.Net2
             Dim result As String = GetPublicIPFromChinaz()
 
 			' 用第一种方法获取失败 并且网络已连接
-			If result.Length = 0 AndAlso NetHelper.IsConnected() Then
+			If result.Length = 0 AndAlso NetHelper.IsConnectedToInternet() Then
 				result = GetPublicIPFromWanWang()
 			End If
 

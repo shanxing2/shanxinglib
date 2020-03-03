@@ -62,12 +62,12 @@ Namespace ShanXingTech.Win32API
 		''' <param name="dwFlags"></param>
 		''' <param name="lpReserved"></param>
 		''' <returns></returns>
-		<DllImport("wininet.dll", CharSet:=CharSet.Unicode, SetLastError:=True)>
+		<DllImport(ExternDll.Wininet, CharSet:=CharSet.Unicode, SetLastError:=True)>
 		Public Function InternetGetCookieEx(pchURL As String, pchCookieName As String, pchCookieData As StringBuilder, ByRef pcchCookieData As Integer, dwFlags As Integer, lpReserved As IntPtr) As Boolean
 		End Function
 
 
-		<DllImport("urlmon.dll", CharSet:=CharSet.Ansi)>
+		<DllImport(ExternDll.Urlmon, CharSet:=CharSet.Ansi)>
 		Public Function UrlMkSetSessionOption(dwOption As Integer, pBuffer As String, dwBufferLength As Integer, dwReserved As Integer) As Integer
 		End Function
 
@@ -78,29 +78,35 @@ Namespace ShanXingTech.Win32API
 		''' <param name="dwFlags"></param>
 		''' <param name="fEnable"></param>
 		''' <returns></returns>
-		<DllImport("urlmon.dll", CharSet:=CharSet.Auto, SetLastError:=True)>
+		<DllImport(ExternDll.Urlmon, CharSet:=CharSet.Auto, SetLastError:=True)>
 		Public Function CoInternetSetFeatureEnabled(ByVal FeatureEntry As INTERNETFEATURELIST,
 			   ByVal dwFlags As Integer,
 			   ByVal fEnable As Boolean) As Integer
 		End Function
 
 		''' <summary>
-		''' 获取网络状态。该函数如果返回TRUE，表明至少有一个连接是有效的。它并不能保证这个有效的连接是连向一个指定的主机。程序应该经常检查利用API连接到服务器的返回错误代码，用以判断连接状态。使用InternetCheckConnection函数可以判断一个连接到指定主机的连接是否建立。
-		''' 返回值为TRUE也表明一个modem连接处于激活状态或一个LAN连接处于激活状态。而FALSE代表modem和LAN均不处于连接状态。如果返回FALSE，INTERNET_CONNECTION_CONFIGURED 标识将被设置，以表明自动拨号被设置为“总是拨号”，但当前不处于激活状态。如果自动拨号未被设置，函数返回FALSE。
-		''' INTERNET_CONNECTION_LAN 　　　　　    局域网
-		''' INTERNET_CONNECTION_MODEM 　　　    拨号上网
-		''' INTERNET_CONNECTION_PROXY 　　　　  代理
-		''' INTERNET_CONNECTION_MODEM_BUSY 　代理被占用
-		''' INTERNET_CONNECTION_CONFIGURED    虽然可以联网， 但当前不可用
-		''' INTERNET_CONNECTION_OFFLINE 　　　 离线
-		''' INTERNET_RAS_INSTALLED　　　　　　　RAS安装
+		''' 获取本地系统的网络连接状态。
 		''' </summary>
 		''' <param name="dwFlag">指向一个变量，该变量接收连接描述内容。该参数在函数返回FALSE时仍可以返回一个有效的标记。该参数可以为下列值的一个或多个。</param>
+		''' <para>值					含义
+		''' INTERNET_CONNECTION_CONFIGURED	0x40	Local system has a valid connection to the Internet, but it might Or might Not be currently connected.
+		''' INTERNET_CONNECTION_LAN 		0x02	Local system uses a local area network to connect to the Internet.
+		''' INTERNET_CONNECTION_MODEM		0x01	Local system uses a modem to connect to the Internet.
+		''' INTERNET_CONNECTION_MODEM_BUSY	0x08	No longer used.
+		''' INTERNET_CONNECTION_OFFLINE 	0x20	Local system Is in offline mode.
+		''' INTERNET_CONNECTION_PROXY		0x0		Local system uses a proxy server to connect to the Internet.
+		''' INTERNET_RAS_INSTALLED			0x10	Local system has RAS installed.
+		''' </para>
 		''' <param name="dwReserved">保留值,必须为0。</param>
-		''' <returns></returns>
-		<DllImport("wininet.dll", CharSet:=CharSet.Auto, SetLastError:=True)>
+		''' <returns>当存在一个modem或一个LAN连接时，返回TRUE，当不存在internet连接或所有的连接当前未被激活时，返回false。
+		''' <para>当该函数返回false时，程序可以调用GetLastError来接收错误代码</para></returns>
+		''' <remarks>该函数如果返回TRUE，表明至少有一个连接是有效的。它并不能保证这个有效的连接是连向一个指定的主机。程序应该经常检查利用API连接到服务器的返回错误代码，用以判断连接状态。使用InternetCheckConnection函数可以判断一个连接到指定主机的连接是否建立。
+		''' <para>返回值为TRUE也表明一个modem连接处于激活状态或一个LAN连接处于激活状态。而FALSE代表modem和LAN均不处于连接状态。如果返回FALSE，INTERNET_CONNECTION_CONFIGURED 标识将被设置，以表明自动拨号被设置为“总是拨号”，但当前不处于激活状态。如果自动拨号未被设置，函数返回FALSE。</para></remarks>
+		<DllImport(ExternDll.Wininet, CharSet:=CharSet.Auto, SetLastError:=True)>
+		<Obsolete("此函数获取状态有延时，而且不准确，不应该再调用此函数判断网络状态")>
 		Public Function InternetGetConnectedState(ByRef dwFlag As Integer, ByVal dwReserved As Integer) As Boolean
 		End Function
+
 		''' <summary>
 		''' 该函数将指定的消息发送到一个或多个窗口。此函数为指定的窗口调用窗口程序，直到窗口程序处理完消息再返回。而和函数 <see cref="PostMessage(IntPtr, Integer, IntPtr, String)"/> 不同，<see cref="PostMessage(IntPtr, Integer, IntPtr, String)"/> 是将一个消息寄送到一个线程的消息队列后就立即返回。
 		''' </summary>
@@ -180,7 +186,7 @@ Namespace ShanXingTech.Win32API
 		''' <param name="lpszSoundName"></param>
 		''' <param name="uFlags"></param>
 		''' <returns></returns>
-		<DllImport("winmm.dll", EntryPoint:="sndPlaySound", CharSet:=CharSet.Unicode, SetLastError:=True)>
+		<DllImport(ExternDll.WinMM, EntryPoint:="sndPlaySound", CharSet:=CharSet.Unicode, SetLastError:=True)>
 		Public Function SndPlaySound(ByVal lpszSoundName As String, ByVal uFlags As Integer) As Integer
 		End Function
 
@@ -192,7 +198,7 @@ Namespace ShanXingTech.Win32API
 		''' <param name="bufferSize"></param>
 		''' <param name="hwndCallback"></param>
 		''' <returns></returns>
-		<DllImport("winmm.dll", EntryPoint:="mciSendString", CharSet:=CharSet.Unicode, SetLastError:=True)>
+		<DllImport(ExternDll.WinMM, EntryPoint:="mciSendString", CharSet:=CharSet.Unicode, SetLastError:=True)>
 		Public Function MciSendString(ByVal command As String, ByVal buffer As StringBuilder, ByVal bufferSize As Integer, ByVal hwndCallback As IntPtr) As Integer
 		End Function
 
@@ -200,7 +206,7 @@ Namespace ShanXingTech.Win32API
 		''' 返回系统开启算起所经过的时间,单位毫秒。
 		''' </summary>
 		''' <returns></returns>
-		<DllImport("winmm.dll", EntryPoint:="timeGetTime")>
+		<DllImport(ExternDll.WinMM, EntryPoint:="timeGetTime")>
 		Public Function TimeGetTime() As Integer
 		End Function
 
@@ -220,7 +226,7 @@ Namespace ShanXingTech.Win32API
 		''' <param name="lpBuffer"></param>
 		''' <param name="dwBufferLength"></param>
 		''' <returns></returns>
-		<DllImport("wininet.dll", SetLastError:=True, CharSet:=CharSet.Auto)>
+		<DllImport(ExternDll.Wininet, SetLastError:=True, CharSet:=CharSet.Auto)>
 		Public Function InternetSetOption(hInternet As IntPtr, dwOption As Integer, ByRef lpBuffer As IntPtr, dwBufferLength As Integer) As Boolean
 		End Function
 
@@ -523,7 +529,7 @@ Namespace ShanXingTech.Win32API
 		''' <param name="nMaxSize">装载到缓冲区 <paramref name="lpFileName"/> 的最大字符数量</param>
 		''' <returns>如执行成功，返回复制到<paramref name="lpFileName"/>的实际字符数量；
 		''' 零表示失败。使用GetLastError可以打印错误信息。</returns>
-		<DllImport("psapi.dll", SetLastError:=True)>
+		<DllImport(ExternDll.Psapi, SetLastError:=True)>
 		Public Function GetModuleFileNameEx(ByVal hProcess As IntPtr, ByVal hModule As IntPtr, <Out()> ByVal lpFileName As StringBuilder, <[In]()> <MarshalAs(UnmanagedType.U4)> ByVal nMaxSize As Integer) As Integer
 		End Function
 
@@ -617,6 +623,11 @@ Namespace ShanXingTech.Win32API
 		Public Function GetComputerName(lpBuffer As StringBuilder, nMaxSize As Integer) As Boolean
 		End Function
 
+		''' <summary>
+		''' 闪烁指定的窗口。它不会更改窗口的激活状态。
+		''' </summary>
+		''' <param name="pwfi">指向 FLASHWINFO 结构的指针。</param>
+		''' <returns>返回调用 FlashWindowEx 函数之前指定窗口状态。如果调用之前窗口标题是活动的，返回值为非零值。</returns>
 		<DllImport(ExternDll.User32)>
 		Public Function FlashWindowEx(ByRef pwfi As FLASHWINFO) As <MarshalAs(UnmanagedType.Bool)> Boolean
 		End Function

@@ -14,9 +14,9 @@ Namespace ShanXingTech.Net2
     Public Class BaiduNetdisk
 
 #Region "属性区"
-		' http请求需要的cookies，只要在第一次使用的时候设置就可以了，类内部会自动管理cookies
-		Private ReadOnly m_Cookies As CookieContainer
-		Private ReadOnly m_BdsToken As String
+        ' http请求需要的cookies，只要在第一次使用的时候设置就可以了，类内部会自动管理cookies
+        Private ReadOnly m_Cookies As CookieContainer
+        Private ReadOnly m_BdsToken As String
         Private ReadOnly m_BdUSS As String
 
         ''' <summary>
@@ -197,7 +197,7 @@ Namespace ShanXingTech.Net2
                 AddHandler uploadClient.UploadFileCompleted, AddressOf UploadFileCompletedEventHandle
 
                 ' 异步方式上传文件
-                uploadClient.UploadFileAsync(New Uri(url), "POST", uploadInfo.FileFullPath, uploadInfo)
+                uploadClient.UploadFileAsync(New Uri(url), HttpMethod.POST.ToString, uploadInfo.FileFullPath, uploadInfo)
             End Using
 
             ' 此处只是获取第三步操作的结果
@@ -402,7 +402,7 @@ Namespace ShanXingTech.Net2
 
             Dim postData = $"path={uploadPath}{fileName}&autoinit=1&block_list=%5B%22{fileMd5}%22%5D"
 
-            Dim json As HttpResponse = Nothing
+            Dim json As HttpResponse
             Dim uploadID As String = String.Empty
             Try
                 json = Await PreCreateFileAsync(url, postData)
@@ -467,8 +467,6 @@ Namespace ShanXingTech.Net2
 
             fs = New FileStream(fileName, FileMode.Open, FileAccess.Read)
             Dim num As Integer = 8192
-            Dim m_ContentLength = -1L
-
             Dim webReq As HttpWebRequest = DirectCast(WebRequest.Create(""), HttpWebRequest)
 
             If needsHeaderAndBoundary Then
@@ -485,7 +483,6 @@ Namespace ShanXingTech.Net2
             End If
 
             If fs.CanSeek Then
-                m_ContentLength = fs.Length + formHeaderBytes.Length + boundaryBytes.Length
                 num = CInt(Math.Min(8192L, fs.Length))
             End If
             buffer = New Byte(num - 1) {}
@@ -813,10 +810,10 @@ Namespace ShanXingTech.Net2
         ''' </summary>
         ''' <returns></returns>
         Private Function GetBase64LogId() As String
-			Dim funcRst As String = $"{Date.Now.ToTimeStampString(TimePrecision.Millisecond)}0.{CStr(Now.ToFileTime)}"
-			funcRst = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(funcRst))
+            Dim funcRst As String = $"{Date.Now.ToTimeStampString(TimePrecision.Millisecond)}0.{CStr(Now.ToFileTime)}"
+            funcRst = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(funcRst))
 
-			Return funcRst
+            Return funcRst
         End Function
 #End Region
 

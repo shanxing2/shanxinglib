@@ -76,6 +76,8 @@ Namespace ShanXingTech
         Public Const Crypt32 As String = "crypt32.dll"
         Public Const ShCore As String = "SHCore.dll"
         Public Const Wldp As String = "wldp.dll"
+        Public Const Wininet As String = "wininet.dll"
+        Public Const Urlmon As String = "urlmon.dll"
 
         ' system.data specific
         Friend Const Odbc32 As String = "odbc32.dll"
