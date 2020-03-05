@@ -629,6 +629,7 @@ Namespace ShanXingTech.Net2
             Dim statusCode As HttpStatusCode
             Dim responseContent = String.Empty
             Dim cts As CancellationTokenSource
+            Dim response As HttpResponseMessage
 
             Dim registDownloadProgressChangedEventHandler As Boolean
             Try
@@ -649,7 +650,7 @@ Namespace ShanXingTech.Net2
                 Dim ct = cts.Token
 
                 ' 发送请求
-                Dim response = Await httpClient.SendAsync(requestMessage)
+                response = Await httpClient.SendAsync(requestMessage)
                 ct.ThrowIfCancellationRequested()
 
                 Dim responseStream = Await response.Content.ReadAsStreamAsync
@@ -708,7 +709,7 @@ Namespace ShanXingTech.Net2
                 End If
             End Try
 
-            Return New HttpResponse(success, statusCode, responseContent)
+            Return New HttpResponse(success, statusCode, responseContent, response.Headers)
         End Function
 
         Private Shared Sub DownloadProgressChangedEventHandler(sender As Object, e As HttpProgressEventArgs)
@@ -741,6 +742,7 @@ Namespace ShanXingTech.Net2
             Dim success As Boolean
             Dim statusCode As HttpStatusCode
             Dim responseContent As String
+            Dim response As HttpResponseMessage
 
             Dim fileName = Path.GetFileName(uploadInfo.FileFullPath)
             Dim mediaType = FileContentTypeHelper.GetMimeType(fileName)
@@ -772,7 +774,7 @@ Namespace ShanXingTech.Net2
 
 
                     ' 开始上传数据
-                    Dim response = Await httpClient.SendAsync(requestMessage)
+                    response = Await httpClient.SendAsync(requestMessage)
                     responseContent = Await response.Content.ReadAsStringAsync()
 
                     ' 报告上传完成
@@ -805,7 +807,7 @@ Namespace ShanXingTech.Net2
                     End If
                 End Try
 
-                Return New HttpResponse(success, statusCode, responseContent)
+                Return New HttpResponse(success, statusCode, responseContent, response.Headers)
             End Using
         End Function
 #End Region
@@ -1055,7 +1057,7 @@ Namespace ShanXingTech.Net2
                 tryTime -= 1
             Loop Until (httpResponse.Success AndAlso httpResponse.Message.IndexOf(retureIfContain) > -1) OrElse tryTime <= 0
             If httpResponse.Success Then
-                httpResponse = New HttpResponse(httpResponse.Message.IndexOf(retureIfContain) > -1 OrElse tryTime > 0, httpResponse.StatusCode, httpResponse.Message)
+                httpResponse = New HttpResponse(httpResponse.Message.IndexOf(retureIfContain) > -1 OrElse tryTime > 0, httpResponse.StatusCode, httpResponse.Message, httpResponse.Header)
             End If
 
             Return httpResponse
@@ -1474,11 +1476,11 @@ Namespace ShanXingTech.Net2
             Dim httpResponse As HttpResponse
 
             Do
-                httpResponse = Await HttpAsync.TryGetAsync(url, 3)
+                httpResponse = Await TryGetAsync(url, 1)
                 tryTime -= 1
             Loop Until (httpResponse.Success AndAlso httpResponse.Message.IndexOf(retureIfContain) > -1) OrElse tryTime <= 0
             If httpResponse.Success Then
-                httpResponse = New HttpResponse(httpResponse.Message.IndexOf(retureIfContain) > -1 OrElse tryTime > 0, httpResponse.StatusCode, httpResponse.Message)
+                httpResponse = New HttpResponse(httpResponse.Message.IndexOf(retureIfContain) > -1 OrElse tryTime > 0, httpResponse.StatusCode, httpResponse.Message, httpResponse.Header)
             End If
 
             Return httpResponse
@@ -1497,7 +1499,7 @@ Namespace ShanXingTech.Net2
                 tryTime -= 1
             Loop Until (httpResponse.Success AndAlso httpResponse.Message.IndexOf(retureIfContain) > -1) OrElse tryTime <= 0
             If httpResponse.Success Then
-                httpResponse = New HttpResponse(httpResponse.Message.IndexOf(retureIfContain) > -1 OrElse tryTime > 0, httpResponse.StatusCode, httpResponse.Message)
+                httpResponse = New HttpResponse(httpResponse.Message.IndexOf(retureIfContain) > -1 OrElse tryTime > 0, httpResponse.StatusCode, httpResponse.Message, httpResponse.Header)
             End If
 
             Return httpResponse
