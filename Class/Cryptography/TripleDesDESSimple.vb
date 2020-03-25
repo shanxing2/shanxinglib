@@ -30,20 +30,20 @@ Namespace ShanXingTech.Cryptography
         ''' <param name="key">密钥 控制 EncryptString 和 DecryptString 方法。</param>
         Sub New(ByVal key As String)
             ' Initialize the crypto provider.
+            Me.Encoding = Text.Encoding.Unicode
+
             m_TripleDes = New TripleDESCryptoServiceProvider
             m_TripleDes.Key = TruncateHash(key, m_TripleDes.KeySize \ 8)
             m_TripleDes.IV = TruncateHash(String.Empty, m_TripleDes.BlockSize \ 8)
-
-            Me.Encoding = Text.Encoding.Unicode
         End Sub
 
         Sub New(ByVal key As String， ByVal encoding As Text.Encoding)
+            Me.Encoding = encoding
+
             ' Initialize the crypto provider.
             m_TripleDes = New TripleDESCryptoServiceProvider
             m_TripleDes.Key = TruncateHash(key, m_TripleDes.KeySize \ 8)
             m_TripleDes.IV = TruncateHash(String.Empty, m_TripleDes.BlockSize \ 8)
-
-            Me.Encoding = encoding
         End Sub
 
         ''' <summary>
@@ -57,7 +57,7 @@ Namespace ShanXingTech.Cryptography
             Try
                 Using sha1 As New SHA1CryptoServiceProvider
                     ' Hash the key.
-                    Dim keyBytes() As Byte = Encoding.GetBytes(key)
+                    Dim keyBytes() As Byte = Me.Encoding.GetBytes(key)
                     hash = sha1.ComputeHash(keyBytes)
                 End Using
             Catch ex As Exception
@@ -78,7 +78,7 @@ Namespace ShanXingTech.Cryptography
         ''' <returns></returns>
         Public Function EncryptString(ByVal plaintext As String) As String
             ' Convert the plaintext string to a byte array.
-            Dim plaintextBytes() As Byte = Encoding.GetBytes(plaintext)
+            Dim plaintextBytes() As Byte = Me.Encoding.GetBytes(plaintext)
 
             Try
                 ' Create the stream.
@@ -125,7 +125,7 @@ Namespace ShanXingTech.Cryptography
                     decStream.FlushFinalBlock()
 
                     ' Convert the plaintext stream to a string.
-                    Return Encoding.GetString(ms.ToArray)
+                    Return Me.Encoding.GetString(ms.ToArray)
                 End Using
             Catch ex As Exception
                 Return String.Empty
