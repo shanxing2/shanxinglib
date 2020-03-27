@@ -338,7 +338,7 @@ Namespace ShanXingTech.Net2
                 statusCode = response.StatusCode
                 If response.IsSuccessStatusCode Then
                     ' 获取响应文本
-                    responseContent = Await response.Content.ReadAsStringAsync
+                    responseContent = Await ReadAsStringAsync(response)
 
                     statusCode = HttpStatusCode.OK
                     success = True
@@ -365,6 +365,17 @@ Namespace ShanXingTech.Net2
             End Try
 
             Return New HttpResponse(success, statusCode, responseContent, header)
+        End Function
+
+        Private Shared Async Function ReadAsStringAsync(ByVal response As HttpResponseMessage) As Task(Of String)
+            ' 修复 ReadAsStringAsync 引发异常 “utf8”不是支持的编码名。有关定义自定义编码的信息，请参阅关于 Encoding.RegisterProvider 方法的文档 
+            ' 某些网页不规范，charset设置的是 charset=UTF8 而不是 charset=UTF-8，20200327
+            Dim charset = response.Content.Headers.ContentType.CharSet
+            If "utf8".Equals(charset, StringComparison.OrdinalIgnoreCase) Then
+                response.Content.Headers.ContentType.CharSet = "utf-8"
+            End If
+
+            Return Await response.Content.ReadAsStringAsync
         End Function
 
         ''' <summary>
@@ -775,7 +786,7 @@ Namespace ShanXingTech.Net2
 
                     ' 开始上传数据
                     response = Await httpClient.SendAsync(requestMessage)
-                    responseContent = Await response.Content.ReadAsStringAsync()
+                    responseContent = Await ReadAsStringAsync(response)
 
                     ' 报告上传完成
                     RaiseEvent UploadFileCompleted(Nothing, New UploadFileCompletedEventArgs(Nothing, False, Nothing))
