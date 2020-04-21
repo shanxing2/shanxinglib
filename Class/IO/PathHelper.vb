@@ -67,7 +67,7 @@ Namespace ShanXingTech.IO2
         ''' <param name="dialogTitle"></param>
         ''' <returns></returns>
         Public Shared Function GetFileName(ByVal filter As FileFilter, ByVal dialogTitle As String) As (FileName As String, Success As Boolean)
-            Dim getRst = GetFileName(EnsureHandledFileFilter(filter), dialogTitle)
+            Dim getRst = GetFileName(MakeFileFilter(filter), dialogTitle)
 
             Return getRst
         End Function
@@ -332,7 +332,7 @@ Namespace ShanXingTech.IO2
         ''' <param name="filter">筛选器</param>
         ''' <returns>成功返回true，其余返回false</returns>
         Public Shared Function SetSaveFileName(ByVal filter As FileFilter) As (FileName As String, Success As Boolean)
-            Return SetSaveFileName(EnsureHandledFileFilter(filter), "另存为")
+            Return SetSaveFileName(MakeFileFilter(filter), "另存为")
         End Function
 
         ''' <summary>
@@ -341,10 +341,15 @@ Namespace ShanXingTech.IO2
         ''' <param name="filter">筛选器</param>
         ''' <returns>成功返回true，其余返回false</returns>
         Public Shared Function SetSaveFileName(ByVal filter As FileFilter, ByVal dialogTitle As String) As (FileName As String, Success As Boolean)
-            Return SetSaveFileName(EnsureHandledFileFilter(filter), dialogTitle)
+            Return SetSaveFileName(MakeFileFilter(filter), dialogTitle)
         End Function
 
-        Private Shared Function EnsureHandledFileFilter(ByVal filter As FileFilter) As String
+        ''' <summary>
+        ''' 生成文件帅选器字符串
+        ''' </summary>
+        ''' <param name="filter"></param>
+        ''' <returns></returns>
+        Private Shared Function MakeFileFilter(ByVal filter As FileFilter) As String
             Dim filterString = filter.GetDescriptions
             If filterString.IndexOf(", ") > -1 Then
                 filterString = filterString.Replace(", ", "|")
@@ -352,7 +357,6 @@ Namespace ShanXingTech.IO2
 
             Return filterString
         End Function
-
 
         ''' <summary>
         ''' 获取要新建的文件名

@@ -137,7 +137,6 @@
     <Compile Include="Class\IO\Logger.vb" />
     <Compile Include="Class\Media\Mp3Player.vb" />
     <Compile Include="Class\NET\HttpSync.vb" />
-    <Compile Include="Class\NET\BaiduNetdisk.vb" />
     <Compile Include="Class\NET\NetHelper.vb" />
     <Compile Include="Class\NET\UploadInfo.vb" />
     <Compile Include="Class\Win32API\EnumDefines\FlashWindow.vb" />
