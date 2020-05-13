@@ -835,6 +835,26 @@ Namespace ShanXingTech
             End If
             Return Windows2.FlashWindowEx(hwnd, dwFlags, nCount)
         End Function
+
+        ''' <summary>
+        ''' 是否点击了TreeNode的复选框
+        ''' </summary>
+        ''' <param name="e"></param>
+        ''' <returns></returns>
+        <Extension()>
+        Public Function IsClickedCheckbox(ByVal e As TreeNodeMouseClickEventArgs) As Boolean
+            Return e.Location.X >= 22 AndAlso e.Location.X <= 34
+        End Function
+
+        ''' <summary>
+        ''' 是否点击了TreeNode的加减按钮
+        ''' </summary>
+        ''' <param name="e"></param>
+        ''' <returns></returns>
+        <Extension()>
+        Public Function IsClickedPlusMinus(ByVal e As TreeNodeMouseClickEventArgs) As Boolean
+            Return e.Location.X >= 6 AndAlso e.Location.X <= 21
+        End Function
 #End Region
 
     End Module

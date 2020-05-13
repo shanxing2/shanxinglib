@@ -179,8 +179,8 @@ Namespace ShanXingTech
 				End Using
 
 				compressBytes = cms.ToArray()
-			Catch ex As Exception
-				Logger.WriteLine(ex)
+			Catch
+				Throw
 			Finally
 				If cms IsNot Nothing Then
 					cms.Dispose()
@@ -223,8 +223,8 @@ Namespace ShanXingTech
 				End Using
 
 				deCompressBytes = dms.ToArray()
-			Catch ex As Exception
-				Logger.WriteLine(ex)
+			Catch
+				Throw
 			Finally
 				If dms IsNot Nothing Then
 					dms.Dispose()
@@ -255,8 +255,8 @@ Namespace ShanXingTech
 				End Using
 
 				compressBytes = cms.ToArray()
-			Catch ex As Exception
-				Logger.WriteLine(ex)
+			Catch
+				Throw
 			Finally
 				If cms IsNot Nothing Then
 					cms.Dispose()
@@ -301,8 +301,8 @@ Namespace ShanXingTech
 				End Using
 
 				deCompressBytes = dms.ToArray()
-			Catch ex As Exception
-				Logger.WriteLine(ex)
+			Catch
+				Throw
 			Finally
 				If dms IsNot Nothing Then
 					dms.Dispose()
@@ -895,7 +895,17 @@ Namespace ShanXingTech
 		End Function
 
 		''' <summary>
-		''' 
+		''' 反序列化
+		''' </summary>
+		''' <param name="input"></param>
+		''' <returns></returns>
+		<Extension()>
+		Public Function Deserialize(Of T As Class)(ByVal input As String) As T
+			Return MSJsSerializer.Deserialize(Of T)(input)
+		End Function
+
+		''' <summary>
+		''' 序列化
 		''' </summary>
 		''' <param name="source"></param>
 		''' <returns></returns>

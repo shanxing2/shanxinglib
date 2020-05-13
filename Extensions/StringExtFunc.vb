@@ -1061,6 +1061,33 @@ Namespace ShanXingTech
             Return True
         End Function
 
+        ''' <summary>
+        ''' 转义 字符串中包含 Like操作符(<seealso cref="DataTable.Select(String)"/>) 支持的通配符。
+        ''' Operator LIKE is used to include only values that match a pattern with wildcards. Wildcard character is * or %, it can be at the beginning of a pattern '*value', at the end 'value*', or at both '*value*'. Wildcard in the middle of a patern 'va*lue' is not allowed.
+        ''' If a pattern in a LIKE clause contains any of these special characters * % [ ], those characters must be escaped in brackets [ ] like this [*], [%], [[] or []].
+        ''' see https://www.csharp-examples.net/dataview-rowfilter/
+        ''' </summary>
+        ''' <param name="valueWithWildcards"></param>
+        <Extension()>
+        Public Function TryEscapeLikeWildcards(ByVal valueWithWildcards As String) As String
+            If valueWithWildcards.IsNullOrEmpty Then Return String.Empty
 
+            Dim sb = StringBuilderCache.Acquire(360)
+
+            Dim i As Integer
+            While i < valueWithWildcards.Length
+                Dim c As Char = valueWithWildcards(i)
+                If c = "*"c OrElse c = "%"c OrElse c = "["c OrElse c = "]"c Then
+                    sb.Append("[").Append(c).Append("]")
+                ElseIf c = "'"c Then
+                    sb.Append("''")
+                Else
+                    sb.Append(c)
+                End If
+                i += 1
+            End While
+
+            Return StringBuilderCache.GetStringAndReleaseBuilder(sb)
+        End Function
     End Module
 End Namespace

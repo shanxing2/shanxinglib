@@ -188,6 +188,7 @@ Namespace ShanXingTech.Net2
 			ServicePointManager.UseNagleAlgorithm = True
 			' HttpWebRequest 的请求因为网络问题导致连接没有被释放则会占用连接池中的连接个数，导致并发连接数量减少
 			ServicePointManager.SetTcpKeepAlive(True, 1000 * 30, 2)
+			ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12
 			' 不使用缓存 使用缓存可能会得到错误的结果
 			WebRequest.DefaultCachePolicy = New Cache.RequestCachePolicy(Cache.RequestCacheLevel.NoCacheNoStore)
 			' 解决第一次请求时很慢的问题 不使用代理
@@ -231,8 +232,7 @@ Namespace ShanXingTech.Net2
 		''' <param name="setSomeRequestHeader">如果设置为True,则自动设置Accept-Encoding、Cache-Control、User-Agent三个请求头为工具内部默认值</param>
 		''' <returns></returns>
 		Private Shared Function GetHttpWebRequest(url As String, method As HttpMethod, ByRef cookies As CookieContainer, httpHeadersParam As Dictionary(Of HttpRequestHeader, String), ByVal setSomeRequestHeader As Boolean) As HttpWebRequest
-
-			Dim request As HttpWebRequest = Nothing
+			Dim request As HttpWebRequest
 			Try
 				If url.StartsWith("https".TryGetIntern, StringComparison.OrdinalIgnoreCase) Then
 					If s_IgnoreSSLCheck Then
@@ -242,7 +242,7 @@ Namespace ShanXingTech.Net2
 																				  End Function
 					End If
 					request = DirectCast(WebRequest.CreateDefault(New Uri(url)), HttpWebRequest)
-					request.ProtocolVersion = HttpVersion.Version11
+					request.ProtocolVersion = HttpVersion.Version10
 				Else
 					request = DirectCast(WebRequest.Create(url), HttpWebRequest)
 				End If
@@ -411,9 +411,9 @@ Namespace ShanXingTech.Net2
 		''' <param name="cookies"></param>
 		''' <returns></returns>
 		Private Shared Function GetResponseAsString(ByVal request As HttpWebRequest, ByVal encoding As Text.Encoding, ByRef cookies As CookieContainer) As String
-			Dim responseContent As String
-			Dim response As HttpWebResponse = Nothing
-			Dim stream As Stream = Nothing
+			Dim responseContent As String = NetWorkError
+			Dim response As HttpWebResponse
+			Dim stream As Stream
 
 			Try
 				response = DirectCast(request.GetResponse, HttpWebResponse)
@@ -466,7 +466,7 @@ Namespace ShanXingTech.Net2
 		''' <param name="request"></param>
 		''' <returns></returns>
 		Private Shared Function GetResponseAsString(ByVal request As HttpWebRequest, ByRef cookies As CookieContainer) As String
-			Dim responseContent As String
+			Dim responseContent As String = NetWorkError
 			Dim response As HttpWebResponse = Nothing
 			Dim stream As Stream = Nothing
 
@@ -879,6 +879,7 @@ Namespace ShanXingTech.Net2
 		Public Shared Function GetHtmlThreeTimeIfError(ByVal url As String, ByVal encoding As Encoding, ByRef cookies As CookieContainer, ByVal httpHeadersParam As Dictionary(Of HttpRequestHeader, String)) As String
 
 			Dim responseContent As String
+			Dim request As HttpWebRequest
 
 			' 最少执行一次，最多执行三次 一定程度上确保操作能成功
 			Dim getTime As Integer
@@ -886,12 +887,11 @@ Namespace ShanXingTech.Net2
 
 #Region "Get操作主体"
 				' 向指定地址发送请求
-				Dim request As HttpWebRequest = GetHttpWebRequest(url:=url, method:=HttpMethod.GET, cookies:=cookies, httpHeadersParam:=httpHeadersParam, setSomeRequestHeader:=False)
+				request = GetHttpWebRequest(url:=url, method:=HttpMethod.GET, cookies:=cookies, httpHeadersParam:=httpHeadersParam, setSomeRequestHeader:=False)
 
 				' 任何时候都返回 响应头中的cookie
 				responseContent = GetResponseAsString(request, encoding, cookies)
 #End Region
-
 				getTime += 1
 
 				' 没有联网并且获取网络信息错误的时候 马上退出 

@@ -140,9 +140,9 @@ Namespace ShanXingTech
                     Return
                 End If
 
-                parentCtrl.Invoke(
+                parentCtrl?.Invoke(
                 Sub()
-                    parentCtrl.Controls.Remove(lbl)
+                    parentCtrl?.Controls.Remove(lbl)
                     If lbl.Visible Then lbl.Hide()
                     lbl.Dispose()
                     parentCtrl?.Refresh()
