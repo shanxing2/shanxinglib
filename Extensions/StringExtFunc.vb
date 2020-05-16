@@ -570,94 +570,22 @@ Namespace ShanXingTech
 #End Region
 
 #Region "当 findString 长度大于等于2时使用此方法查找"
-            ' 根据需要对比的字符串 findString 长度动态设置每次需要提取的对比字符串长度
-            ' 有利于提高效率
-            Dim compareStringLength As Integer
-            If findStringlength = 2 Then
-                compareStringLength = 2
-            ElseIf findStringlength = 4 Then
-                compareStringLength = 4
-            Else
-                compareStringLength = 8
-            End If
-            Dim initCompareStringLength = compareStringLength
-
-            Dim fIndex As Integer
-            Dim sbFoundIndex As Integer
-            Dim samePreviou As Boolean
-            Dim sameIndex As Integer = -1
-            ' 标记当前应该从sb的哪个位置开始取数据（作用于之前有相同的，但是后面不同，需要重新再进一位匹配）
-            Dim forIndex As Integer
-            Dim isFoundSbEnd As Boolean
-
-            While fIndex < findStringlength
-                Dim compareFromFindString = String.Empty
-
-                ' 如果需要提取来对比的字符串长度不足，则取剩下的
-                If findStringlength - fIndex < compareStringLength Then
-                    compareStringLength = findStringlength - fIndex
-                End If
-                compareFromFindString = findString.Substring(fIndex, compareStringLength)
-
-                'Debug.Print(Logger.MakeDebugString( $"   从sb中查找 {compareFromFindString}"))
-
-                Dim compareFromSb = String.Empty
-                ' 从sb的0索引处开始找起，取compareStringLength长度的字符串出来比较（如果不够compareStringLength长度，则取剩余的）
-                ' 如果不同，再从0+1所以开始，继续取compareStringLength长度的字符串出来比较（如果不够compareStringLength长度，则取剩余的）
-                ' 如果相同，索引0+compareStringLength，下一次将从索引0+compareStringLength开始取compareStringLength长度的字符串出来比较（如果不够compareStringLength长度，则取剩余的）
-                ' 类推。。。
-                For sbStartIndex = sbFoundIndex To sblength - 1
-                    If sblength - sbStartIndex = 1 OrElse compareStringLength = 1 Then
-                        isFoundSbEnd = True
-                        compareFromSb = sb.Chars(sbStartIndex)
-                    Else
-                        compareFromSb = sb.Substring(sbStartIndex, compareStringLength)
+            Dim startIndex As Integer
+            While startIndex + findStringlength <= sb.Length
+                If sb(startIndex) = findString(0) Then
+                    Dim tempStartIndex = startIndex
+                    If ScanRight(sb, findString, startIndex) Then
+                        Return tempStartIndex
                     End If
-
-                    Dim isSameString = compareFromFindString.Equals(compareFromSb, StringComparison.OrdinalIgnoreCase)
-                    If isSameString Then
-                        'Debug.Print(Logger.MakeDebugString( $"   从sb中取出对比 {compareFromSb} 相同"))
-                        sbFoundIndex = sbStartIndex + compareStringLength
-                        If sameIndex = -1 Then
-                            'Debug.Print(Logger.MakeDebugString( $"   开始相同位置 {sbStartIndex}  从findString 本次提取长度{compareStringLength} 下一次提取位置{sbFoundIndex}"))
-                            sameIndex = sbStartIndex
-                        End If
-                        samePreviou = True
-                        ' 如果相同退出本次循环，继续对比下后 compareStringLength 个字符串
-                        ' 如果已经提取 findString 完毕 并且相同的话则直接返回
-                        If sblength - 1 <= sbFoundIndex Then
-                            'Debug.Print(Logger.MakeDebugString( $"   全部查找完毕，开始相同位置 {sameIndex}"))
-                            Return sameIndex
-                        End If
-                        Exit For
-                    ElseIf samePreviou AndAlso Not isSameString Then
-                        'Debug.Print(Logger.MakeDebugString( $"   从sb中取出 {compareFromSb} 前面相同但是后面不同 开始相同位置初始化 -1"))
-                        sameIndex = -1
-                        samePreviou = False
-                        compareStringLength = initCompareStringLength
-                    Else
-                        'Debug.Print(Logger.MakeDebugString( $"   从sb中取出 {compareFromSb} 不同"))
-                    End If
-
-                    If sblength - sbStartIndex <= compareStringLength OrElse isFoundSbEnd Then
-                        ' 检查到sb最后一批长度为 compareStringLength 的字符串的时候，还是不同，说明sb里面没有 findString
-                        'Debug.Print(Logger.MakeDebugString( $"   全部查找完毕，没有找到 {findString}"))
-                        Return -1
-                    End If
-                Next
-
-                If sameIndex <> -1 Then
-                    fIndex += compareStringLength
                 Else
-                    forIndex += 1
-                    fIndex = 0
-                    ''Debug.Print(Logger.MakeDebugString( $"   第 {forIndex} 轮对比完毕{Environment.NewLine}"))
+                    startIndex += 1
                 End If
             End While
 #End Region
 
-            Return sameIndex
+            Return -1
         End Function
+
 
         ''' <summary>
         ''' 从 <paramref name="sb"/> 的 <paramref name="startIndex"/> 位置开始或者 <paramref name="length"/> 长度字符串
@@ -723,8 +651,10 @@ Namespace ShanXingTech
             Dim findStringLength = findString.Length
 
             While buidlerIndex > 0
-                If findString(0) = sb(buidlerIndex) AndAlso ScanRight(sb, findString, buidlerIndex + 1) Then
-                    sb.Remove(buidlerIndex, findStringLength)
+                Dim tempBuidlerIndex = buidlerIndex
+                If findString(0) = sb(buidlerIndex) AndAlso ScanRight(sb, findString, buidlerIndex) Then
+                    sb.Remove(tempBuidlerIndex, findStringLength)
+                    buidlerIndex = tempBuidlerIndex
                 End If
                 buidlerIndex -= 1
             End While
@@ -941,13 +871,13 @@ Namespace ShanXingTech
 
             Dim sb = StringBuilderCache.Acquire(urlLength)
             While i < urlLength
-                ' 是 key的第一个字符，并且往后都一样+前面一个字符是&或者？
+                ' 是 key的第一个字符，并且往后都一样，并且前面一个字符是&或者？
                 If IsCharEqual(key(0), url(i), True) AndAlso
-                    ScanRight(url, key, i + 1) AndAlso
-                    "="c = url(i + key.Length) AndAlso
-                    (i = 0 OrElse ("&"c = url(i - 1) OrElse "?"c = url(i - 1))) Then
-                    valueIndex = i + key.Length + 1
-                    i += key.Length + 1
+                    ScanRight(url, key, i) AndAlso
+                    "="c = url(i) AndAlso
+                    (i = 0 OrElse ("&"c = url(i - key.Length - 1) OrElse "?"c = url(i - key.Length - 1))) Then
+                    valueIndex = i + 1
+                    i += 1
                     Continue While
                 End If
 
@@ -1009,13 +939,11 @@ Namespace ShanXingTech
             End If
 
             ' 循环处理3个长度以上的
-            Dim offset = 1
-            Dim keyLength = findString.Length
-            While keyLength > 1
-                If IsCharEqual(findString(offset), compareString(startIndex), ignoreCase) Then
-                    keyLength -= 1
-                    offset += 1
+            Dim i As Integer
+            While i < findString.Length
+                If IsCharEqual(findString(i), compareString(startIndex), ignoreCase) Then
                     startIndex += 1
+                    i += 1
                 Else
                     Return False
                 End If
@@ -1046,13 +974,11 @@ Namespace ShanXingTech
             End If
 
             ' 循环处理3个长度以上的
-            Dim offset = 1
-            Dim keyLength = findString.Length
-            While keyLength > 1
-                If IsCharEqual(findString(offset), compareBuilder(startIndex), ignoreCase) Then
-                    keyLength -= 1
-                    offset += 1
+            Dim i As Integer
+            While i < findString.Length
+                If IsCharEqual(findString(i), compareBuilder(startIndex), ignoreCase) Then
                     startIndex += 1
+                    i += 1
                 Else
                     Return False
                 End If

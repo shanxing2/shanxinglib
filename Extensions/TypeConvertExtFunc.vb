@@ -423,7 +423,7 @@ Namespace ShanXingTech
 			Next
 
 			' 然后判断数组的长度，如果大于1，那就是enumItems中不包含枚举值None项和All项（通常None定义为0,一般会与All同时被定义到枚举项中）
-			Dim sb As StringBuilder = StringBuilderCache.Acquire(100)
+			Dim sb = StringBuilderCache.Acquire(100)
 			Dim splitString = ", "
 			If itemCount > 0 Then
 				For i = 0 To itemCount - 1

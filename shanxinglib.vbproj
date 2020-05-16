@@ -173,6 +173,7 @@
     <Compile Include="Extensions\TimeExtFunc.vb" />
     <Compile Include="Extensions\TypeConvertExtFunc.vb" />
     <Compile Include="Extensions\UIExtFunc.vb" />
+    <Compile Include="Extensions\Utils.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
