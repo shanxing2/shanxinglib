@@ -573,9 +573,10 @@ Namespace ShanXingTech
             Dim startIndex As Integer
             While startIndex + findStringlength <= sb.Length
                 If sb(startIndex) = findString(0) Then
-                    Dim tempStartIndex = startIndex
                     If ScanRight(sb, findString, startIndex) Then
-                        Return tempStartIndex
+                        Return startIndex
+                    Else
+                        startIndex += 1
                     End If
                 Else
                     startIndex += 1
@@ -651,10 +652,9 @@ Namespace ShanXingTech
             Dim findStringLength = findString.Length
 
             While buidlerIndex > 0
-                Dim tempBuidlerIndex = buidlerIndex
-                If findString(0) = sb(buidlerIndex) AndAlso ScanRight(sb, findString, buidlerIndex) Then
-                    sb.Remove(tempBuidlerIndex, findStringLength)
-                    buidlerIndex = tempBuidlerIndex
+                If findString(0) = sb(buidlerIndex) AndAlso
+                    ScanRight(sb, findString, buidlerIndex) Then
+                    sb.Remove(buidlerIndex, findStringLength)
                 End If
                 buidlerIndex -= 1
             End While
@@ -868,16 +868,16 @@ Namespace ShanXingTech
             Dim i As Integer
             Dim valueIndex As Integer = -1
             Dim nextKeyIndex As Integer = -1
-
+            ' "(\w+)=([\w+|-|/|+|=]*)"
             Dim sb = StringBuilderCache.Acquire(urlLength)
             While i < urlLength
                 ' 是 key的第一个字符，并且往后都一样，并且前面一个字符是&或者？
                 If IsCharEqual(key(0), url(i), True) AndAlso
                     ScanRight(url, key, i) AndAlso
-                    "="c = url(i) AndAlso
-                    (i = 0 OrElse ("&"c = url(i - key.Length - 1) OrElse "?"c = url(i - key.Length - 1))) Then
-                    valueIndex = i + 1
-                    i += 1
+                    "="c = url(i + key.Length) AndAlso
+                    (i = 0 OrElse ("&"c = url(i - 1) OrElse "?"c = url(i - 1))) Then
+                    valueIndex = i + key.Length + 1
+                    i = valueIndex
                     Continue While
                 End If
 
@@ -926,7 +926,7 @@ Namespace ShanXingTech
         ''' <param name="ignoreCase">忽略大小写</param>
         ''' <returns></returns>
         <Extension()>
-        Public Function ScanRight(ByVal compareString As String, ByVal findString As String, ByRef startIndex As Integer, Optional ByVal ignoreCase As Boolean = True) As Boolean
+        Public Function ScanRight(ByVal compareString As String, ByVal findString As String, ByVal startIndex As Integer, Optional ByVal ignoreCase As Boolean = True) As Boolean
             If findString.Length > compareString.Length - startIndex Then
                 Return False
             End If
@@ -961,7 +961,7 @@ Namespace ShanXingTech
         ''' <param name="ignoreCase">忽略大小写</param>
         ''' <returns></returns>
         <Extension()>
-        Public Function ScanRight(ByVal compareBuilder As StringBuilder, ByVal findString As String, ByRef startIndex As Integer, Optional ByVal ignoreCase As Boolean = True) As Boolean
+        Public Function ScanRight(ByVal compareBuilder As StringBuilder, ByVal findString As String, ByVal startIndex As Integer, Optional ByVal ignoreCase As Boolean = True) As Boolean
             If findString.Length > compareBuilder.Length - startIndex Then
                 Return False
             End If
@@ -970,7 +970,7 @@ Namespace ShanXingTech
             If findString.Length = 1 Then
                 Return True
             ElseIf findString.Length = 2 Then
-                Return IsCharEqual(findString(1), compareBuilder(startIndex), ignoreCase)
+                Return IsCharEqual(findString(1), compareBuilder(startIndex + 1), ignoreCase)
             End If
 
             ' 循环处理3个长度以上的
