@@ -168,6 +168,7 @@
     <Compile Include="Extensions\EnumDefine\GlobleEnum.vb" />
     <Compile Include="Extensions\ExtensionFunc.vb" />
     <Compile Include="Extensions\IOExtFunc.vb" />
+    <Compile Include="Extensions\LinqExtFunc.vb" />
     <Compile Include="Extensions\NetExtFunc.vb" />
     <Compile Include="Extensions\StringExtFunc.vb" />
     <Compile Include="Extensions\TimeExtFunc.vb" />

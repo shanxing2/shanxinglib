@@ -372,7 +372,7 @@ Namespace ShanXingTech
         Public Sub ShowFollowMousePosition(Of T As Form)(ByRef childForm As T, ByVal actionWhileMouseLeave As MouseLeaveAction, ByVal yOffset As Integer, ByVal topMost As Boolean)
             ' 计算鼠标相对于屏幕的位置，窗体出现的位置以 mousePoint 为参考点
             ' 如果 子窗体的‘下、右’任一部超出了屏幕，则自动向‘上、左’调整到能显示完整窗体为止
-            Dim mousePoint = childForm.PointToClient(Control.MousePosition)
+            Dim mousePoint = childForm.PointToClient(Cursor.Position)
             Dim childFormX = mousePoint.X
             Dim childFormY = mousePoint.Y + yOffset
 
@@ -625,7 +625,7 @@ Namespace ShanXingTech
         ''' <param name="appendColumns">要动态添加的列</param> 
         ''' <returns></returns>
         <Extension()>
-        Public Function AdjustDgv(Of T As DataGridView)(ByRef dgv As T， ByVal showLastColumn As Boolean, ByVal autoSizeColumnsMode As DataGridViewAutoSizeColumnsMode, ByVal appendColumns As DataGridViewColumn()) As Boolean
+        Public Function AdjustDgv(Of T As DataGridView)(ByRef dgv As T， ByVal showLastColumn As Boolean, ByVal autoSizeColumnsMode As DataGridViewAutoSizeColumnsMode, ByVal appendColumns As DataGridViewColumn(), Optional ByVal sortMode As DataGridViewColumnSortMode = DataGridViewColumnSortMode.NotSortable) As Boolean
             Try
                 ' 如果已经调整过 就不需要再次调整
                 If dgv.ReadOnly Then
@@ -638,6 +638,11 @@ Namespace ShanXingTech
                     If appendColumns?.Length > 0 Then
                         dgv.Columns.AddRange(appendColumns)
                     End If
+
+                    ' 不需要排序（去掉小三角 小三角会影响列宽）
+                    For Each col As DataGridViewColumn In .Columns
+                        col.SortMode = sortMode
+                    Next col
 
                     ' 是否隐藏最后一列
                     dgv.Columns.Item(dgv.Columns.Count - 1).Visible = showLastColumn
@@ -676,44 +681,10 @@ Namespace ShanXingTech
         ''' <param name="appendColumn">要动态添加的列</param> 
         ''' <returns></returns>
         <Extension()>
-        Public Function AdjustDgv(Of T As DataGridView)(ByRef dgv As T， ByVal showLastColumn As Boolean, ByVal autoSizeColumnsMode As DataGridViewAutoSizeColumnsMode, ByVal appendColumn As DataGridViewColumn) As Boolean
-            Try
-                ' 如果已经调整过 就不需要再次调整
-                If dgv.ReadOnly Then
-                    Return True
-                End If
-
-                With dgv
-                    .SuspendLayout()
-
-                    If appendColumn IsNot Nothing AndAlso
-                        Not .Columns.Contains(appendColumn) Then
-                        .Columns.Add(appendColumn)
-                    End If
-
-                    ' 是否隐藏最后一列
-                    .Columns.Item(.Columns.Count - 1).Visible = showLastColumn
-
-                    ' 标题剧中对齐
-                    .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
-                    .AutoSizeColumnsMode = autoSizeColumnsMode
-                    ' 标题不换行
-                    .ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.False
-
-                    .AllowDrop = False
-                    .AllowUserToAddRows = False
-                    .AllowUserToDeleteRows = False
-                    .ReadOnly = True
-
-                    .ResumeLayout()
-                End With
-
-                Return True
-            Catch ex As Exception
-                Logger.WriteLine(ex)
-
-                Return False
-            End Try
+        Public Function AdjustDgv(Of T As DataGridView)(ByRef dgv As T， ByVal showLastColumn As Boolean, ByVal autoSizeColumnsMode As DataGridViewAutoSizeColumnsMode, ByVal appendColumn As DataGridViewColumn, Optional ByVal sortMode As DataGridViewColumnSortMode = DataGridViewColumnSortMode.NotSortable) As Boolean
+            Dim newColumn(0) As DataGridViewColumn
+            newColumn(0) = appendColumn
+            Return AdjustDgv(dgv, showLastColumn, autoSizeColumnsMode, newColumn, sortMode)
         End Function
 
         ''' <summary>
@@ -728,38 +699,8 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function AdjustDgv(Of T As DataGridView)(ByRef dgv As T， ByVal showLastColumn As Boolean, ByVal autoSizeColumnsMode As DataGridViewAutoSizeColumnsMode) As Boolean
-            Try
-                ' 如果已经调整过 就不需要再次调整
-                If dgv.ReadOnly Then
-                    Return True
-                End If
-
-                With dgv
-                    .SuspendLayout()
-
-                    ' 是否隐藏最后一列
-                    .Columns.Item(.Columns.Count - 1).Visible = showLastColumn
-
-                    ' 标题剧中对齐
-                    .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
-                    .AutoSizeColumnsMode = autoSizeColumnsMode
-                    ' 标题不换行
-                    .ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.False
-
-                    .AllowDrop = False
-                    .AllowUserToAddRows = False
-                    .AllowUserToDeleteRows = False
-                    .ReadOnly = True
-
-                    .ResumeLayout()
-                End With
-
-                Return True
-            Catch ex As Exception
-                Logger.WriteLine(ex)
-
-                Return False
-            End Try
+            Dim emptyColumn() As DataGridViewColumn
+            Return AdjustDgv(dgv, showLastColumn, autoSizeColumnsMode, emptyColumn, DataGridViewColumnSortMode.NotSortable)
         End Function
 
         ''' <summary>

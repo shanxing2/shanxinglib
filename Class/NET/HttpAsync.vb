@@ -1726,41 +1726,39 @@ Namespace ShanXingTech.Net2
 
             If disposing Then
                 ' TODO: 释放托管状态(托管对象)。
+                If m_ProgressMessageHandler IsNot Nothing Then
+                    m_ProgressMessageHandler.Dispose()
+                    m_ProgressMessageHandler = Nothing
+                End If
 
+                If m_HttpClientHandler IsNot Nothing Then
+                    m_HttpClientHandler.Dispose()
+                    m_HttpClientHandler = Nothing
+                End If
+
+                If m_HttpClient IsNot Nothing Then
+                    m_HttpClient.Dispose()
+                    m_HttpClient = Nothing
+                End If
+
+                If s_ProgressMessageHandler IsNot Nothing Then
+                    s_ProgressMessageHandler.Dispose()
+                    s_ProgressMessageHandler = Nothing
+                End If
+
+                If s_HttpClientHandler IsNot Nothing Then
+                    s_HttpClientHandler.Dispose()
+                    s_HttpClientHandler = Nothing
+                End If
+
+                If s_HttpClient IsNot Nothing Then
+                    s_HttpClient.Dispose()
+                    s_HttpClient = Nothing
+                End If
             End If
 
             ' TODO: 释放未托管资源(未托管对象)并在以下内容中替代 Finalize()。
             ' TODO: 将大型字段设置为 null。
-
-            If m_ProgressMessageHandler IsNot Nothing Then
-                m_ProgressMessageHandler.Dispose()
-                m_ProgressMessageHandler = Nothing
-            End If
-
-            If m_HttpClientHandler IsNot Nothing Then
-                m_HttpClientHandler.Dispose()
-                m_HttpClientHandler = Nothing
-            End If
-
-            If m_HttpClient IsNot Nothing Then
-                m_HttpClient.Dispose()
-                m_HttpClient = Nothing
-            End If
-
-            If s_ProgressMessageHandler IsNot Nothing Then
-                s_ProgressMessageHandler.Dispose()
-                s_ProgressMessageHandler = Nothing
-            End If
-
-            If s_HttpClientHandler IsNot Nothing Then
-                s_HttpClientHandler.Dispose()
-                s_HttpClientHandler = Nothing
-            End If
-
-            If s_HttpClient IsNot Nothing Then
-                s_HttpClient.Dispose()
-                s_HttpClient = Nothing
-            End If
             disposedValue = True
         End Sub
 
