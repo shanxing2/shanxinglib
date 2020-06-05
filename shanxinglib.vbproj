@@ -165,6 +165,8 @@
     <Compile Include="EnumDefines\RecognizeMode.vb" />
     <Compile Include="EnumDefines\WorkStatus.vb" />
     <Compile Include="Extensions\ArrayExtFunc.vb" />
+    <Compile Include="Extensions\ConfBase.vb" />
+    <Compile Include="Extensions\ConfExtFunc.vb" />
     <Compile Include="Extensions\EnumDefine\GlobleEnum.vb" />
     <Compile Include="Extensions\ExtensionFunc.vb" />
     <Compile Include="Extensions\IOExtFunc.vb" />

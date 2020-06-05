@@ -239,6 +239,31 @@ Namespace ShanXingTech.IO2
                 ' 把具体信息存到本地缓存 以备导出
                 Writer.WriteText(cacheTxtFilePath, value)
 
+                Dim convertRst = ExportToExcel(cacheTxtFilePath, columnsDataType, columnDelimiter, excelFileFullPath)
+
+                ' 如果导出失败 会返回false
+                funcRst = convertRst.Success
+
+                ' 把返回的文件名或者错误信息保存起来
+                excelFileFullPath = convertRst.ExcelFileName
+            Catch ex As Exception
+                Logger.WriteLine(ex)
+            End Try
+
+            Return (excelFileFullPath, funcRst)
+        End Function
+
+        ''' <summary>
+        ''' 从缓存<paramref name="cacheTxtFilePath"/>导出到Excel,需要传入Excel文件保存路径
+        ''' </summary>
+        ''' <param name="columnsDataType">格式值列表，列表项数与列数对应,传入空列表或者Nothing将自动转换</param>
+        ''' <param name="columnDelimiter">列分隔符,注：连续的分隔符会自动合并</param>
+        ''' <param name="excelFileFullPath">将存储Excel文件的绝对路径；如果带有后缀名，函数会自动去掉传入的后缀名，然后根据系统环境使用合适的后缀名</param>
+        ''' <returns>Success指示是否导出成功，ExcelFileName为Excel文件的保存路径</returns>
+        Public Shared Function ExportToExcel(ByVal cacheTxtFilePath As String, ByRef columnsDataType As List(Of ExcelColumnDataType), ByRef columnDelimiter As String, ByRef excelFileFullPath As String) As (ExcelFileName As String, Success As Boolean)
+            Dim funcRst As Boolean
+
+            Try
                 ' 去掉后缀，函数会自己根据系统安装的excel文档选择合适的后缀
                 Dim fileExtention = ".xls"
                 If excelFileFullPath.EndsWith(fileExtention, StringComparison.OrdinalIgnoreCase) Then
@@ -275,9 +300,7 @@ Namespace ShanXingTech.IO2
                 End Sub).GetAwaiter.GetResult()
 
                 ' 如果导出失败 会返回false
-                If convertOperate.Success Then
-                    funcRst = True
-                End If
+                funcRst = convertOperate.Success
 
                 ' 把返回的文件名或者错误信息保存起来
                 excelFileFullPath = convertOperate.ExcelFileName
