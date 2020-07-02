@@ -175,7 +175,8 @@ Namespace ShanXingTech
 		''' 生成当日Log文件路径名
 		''' </summary>
 		Private Shared Sub MakeNowDayLogFileName()
-			If m_LastDate.Day < Date.Now.Day Then
+			If m_LastDate.Day < Date.Now.Day OrElse
+				m_LastDate.Month < Date.Now.Month Then
 				m_LastDate = Date.Now
 				m_LogFile = $"C:\ShanXingTech\Log\log{Date.Now.ToString("MMdd")}.log"
 			End If

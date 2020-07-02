@@ -438,10 +438,18 @@ Namespace ShanXingTech
                         Continue For
                     End If
 
-                    sb.Append(String.Concat(tempEnumItems(i).GetDescription(), splitString))
+                    ' 过滤空 Desc
+                    Dim desc = tempEnumItems(i).GetDescription()
+                    If desc.Length = 0 Then Continue For
+
+                    sb.Append(String.Concat(desc, splitString))
                 Next
             Else
-                sb.Append(String.Concat(tempEnumItems(0).GetDescription(), splitString))
+                Dim desc = tempEnumItems(0).GetDescription()
+                ' 过滤空 Desc
+                If desc.Length > 0 Then
+                    sb.Append(String.Concat(desc, splitString))
+                End If
             End If
 
             ' 去掉最后的", " 从后面往前面判断
