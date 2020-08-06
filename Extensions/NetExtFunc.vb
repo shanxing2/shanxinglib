@@ -21,7 +21,7 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function OffsetPoint(ByVal htmlTag As HtmlElement) As (Point As Point, TopParent As HtmlElement)
-            Dim topParent = htmlTag.OffsetParent
+            Dim topParent = htmlTag
             Dim oldTopParent = topParent
             Dim pointOffset As New Point()
             Do
@@ -141,8 +141,8 @@ Namespace ShanXingTech
             End If
 
             Try
-				Dim cookieKeyValuePairs = Net2.NetHelper.GetCookie(url)
-				ParseCookie(cookies， cookieKeyValuePairs， url)
+                Dim cookieKeyValuePairs = Net2.NetHelper.GetCookie(url)
+                ParseCookie(cookies， cookieKeyValuePairs， url)
             Catch ex As Exception
                 Logger.WriteLine(ex)
             End Try
@@ -174,17 +174,17 @@ Namespace ShanXingTech
         ''' <param name="cookieKeyValuePairs"></param>
         ''' <param name="domain"></param>
         Private Sub ParseCookie(ByRef Cookies As CookieContainer, ByVal cookieKeyValuePairs As String， ByVal domain As String)
-			' ##########################20170330########################
-			' 获取传入的domain的根域名（主域名）
-			' 如https://myseller.taobao.com，根域名是.taobao.com
-			' 暂时没有找到方法确定某个cookie所属的domain，暂时设定为传入url的根域名
-			' ##########################20170704########################
-			domain = Net2.NetHelper.GetRootDomain(domain)
+            ' ##########################20170330########################
+            ' 获取传入的domain的根域名（主域名）
+            ' 如https://myseller.taobao.com，根域名是.taobao.com
+            ' 暂时没有找到方法确定某个cookie所属的domain，暂时设定为传入url的根域名
+            ' ##########################20170704########################
+            domain = Net2.NetHelper.GetRootDomain(domain)
 
-			Dim cookieKeyValuePairArray As String() = cookieKeyValuePairs.Split({";"}, StringSplitOptions.RemoveEmptyEntries)
-			Dim name As String
-			Dim value As String
-			Dim cookie As New Cookie With {
+            Dim cookieKeyValuePairArray As String() = cookieKeyValuePairs.Split({";"}, StringSplitOptions.RemoveEmptyEntries)
+            Dim name As String
+            Dim value As String
+            Dim cookie As New Cookie With {
                 .Domain = domain
             }
 
@@ -366,10 +366,10 @@ Namespace ShanXingTech
         ''' <param name="key"></param>
         ''' <returns></returns>
         <Extension()>
-		Public Function ContainKey(ByRef cookies As CookieContainer, ByVal key As String) As Boolean
-			If cookies Is Nothing Then
-				Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(cookies)))
-			End If
+        Public Function ContainKey(ByRef cookies As CookieContainer, ByVal key As String) As Boolean
+            If cookies Is Nothing Then
+                Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(cookies)))
+            End If
 
             If key Is Nothing Then
                 Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(key)))
@@ -380,29 +380,29 @@ Namespace ShanXingTech
             End If
 
             For Each c In cookies.GetEnumerator
-				If c.Name = key Then
-					Return True
-				End If
-			Next
+                If c.Name = key Then
+                    Return True
+                End If
+            Next
 
-			Return False
-		End Function
+            Return False
+        End Function
 
-		''' <summary>
-		''' 
-		''' </summary>
-		''' <param name="cookies"></param>
-		''' <returns></returns>
-		<Extension()>
-		Public Iterator Function GetEnumerator(ByVal cookies As CookieContainer) As IEnumerable(Of Cookie)
-			If cookies Is Nothing Then
-				Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(cookies)))
-			End If
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="cookies"></param>
+        ''' <returns></returns>
+        <Extension()>
+        Public Iterator Function GetEnumerator(ByVal cookies As CookieContainer) As IEnumerable(Of Cookie)
+            If cookies Is Nothing Then
+                Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(cookies)))
+            End If
 
-			' 从非公共成员中获取cookie到表
-			Dim table As Hashtable = DirectCast(cookies.GetType().InvokeMember("m_domainTable", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.GetField Or Reflection.BindingFlags.Instance, Nothing, cookies, Array.Empty(Of Object)()), Hashtable)
+            ' 从非公共成员中获取cookie到表
+            Dim table As Hashtable = DirectCast(cookies.GetType().InvokeMember("m_domainTable", Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.GetField Or Reflection.BindingFlags.Instance, Nothing, cookies, Array.Empty(Of Object)()), Hashtable)
 
-			If table Is Nothing Then Return
+            If table Is Nothing Then Return
 
             ' 从非公共成员中获取cookie到表 遍历
             For Each pathList In table.Values
@@ -415,15 +415,15 @@ Namespace ShanXingTech
             Next
         End Function
 
-		''' <summary>
-		''' 更改程序内部IE浏览器默认的版本号（IE7）为 <paramref name="browserEmulationMode"/>
-		''' <para>需要重新打开程序更改才会生效</para>
-		''' </summary>
-		''' <param name="browser"></param>
-		''' <param name="browserEmulationMode">程序内部IE浏览器的仿真版本</param>
-		''' <param name="appName">app.exe and app.vshost.exe</param>
-		''' <returns>设置成功或者无效设置返回True，设置失败返回False</returns>
-		<Extension()>
+        ''' <summary>
+        ''' 更改程序内部IE浏览器默认的版本号（IE7）为 <paramref name="browserEmulationMode"/>
+        ''' <para>需要重新打开程序更改才会生效</para>
+        ''' </summary>
+        ''' <param name="browser"></param>
+        ''' <param name="browserEmulationMode">程序内部IE浏览器的仿真版本</param>
+        ''' <param name="appName">app.exe and app.vshost.exe</param>
+        ''' <returns>设置成功或者无效设置返回True，设置失败返回False</returns>
+        <Extension()>
         Public Function SetVersionEmulation(ByRef browser As WebBrowser, ByVal browserEmulationMode As BrowserEmulationMode, ByVal appName As String) As (Success As Boolean, NeedToReOpen As Boolean)
             Dim funcRst As Boolean
             Dim needToReOpen As Boolean
@@ -476,7 +476,7 @@ Namespace ShanXingTech
             IntPtrFree(lpBuffer)
 
             If Not success Then
-                Logger.WriteLine( "失败")
+                Logger.WriteLine("失败")
             End If
         End Sub
 
@@ -518,36 +518,36 @@ Namespace ShanXingTech
         ''' <param name="requestHeaders"></param>
         <Extension()>
         Public Sub SetRequestHeaders(ByRef requestMessage As HttpRequestMessage, ByRef requestHeaders As Dictionary(Of String, String)， ByVal method As Net2.HttpMethod)
-            If requestHeaders IsNot Nothing Then
-                ' 如果强求头里面包含 m_Cookies ,那么就抛出异常，提示用户使用 Init 或者 ReInit方法传入 m_Cookies
-                If requestHeaders.ContainsKey("cookie") Then
+            If requestHeaders Is Nothing Then Return
+
+            ' 如果强求头里面包含 m_Cookies ,那么就抛出异常，提示用户使用 Init 或者 ReInit方法传入 m_Cookies
+            If requestHeaders.ContainsKey("cookie") Then
                     Throw New NotSupportedException("不支持传入Cookie，请使用 Init 或者 ReInit方法设置Cookies")
                 End If
 
-				Dim keys = requestHeaders.Keys.ToArray
-				For Each key In keys
-					' Post时不应该在此处设置content-type请求头
-					If method = Net2.HttpMethod.POST AndAlso key.Equals("content-type", StringComparison.OrdinalIgnoreCase) Then
-						Continue For
-					End If
+                Dim keys = requestHeaders.Keys.ToArray
+                For Each key In keys
+                    ' Post时不应该在此处设置content-type请求头
+                    If method = Net2.HttpMethod.POST AndAlso key.Equals("content-type", StringComparison.OrdinalIgnoreCase) Then
+                        Continue For
+                    End If
 
-					' 没有这个请求头时才添加
-					If Not requestMessage.Headers.Contains(key) Then
-						requestMessage.Headers.TryAddWithoutValidation(key, requestHeaders(key))
-					End If
-				Next
-				'For Each header In requestHeaders
-				'                ' Post时不应该在此处设置content-type请求头
-				'                If method = Net2.HttpMethod.POST AndAlso header.Key.Equals("content-type", StringComparison.OrdinalIgnoreCase) Then
-				'                    Continue For
-				'                End If
+                    ' 没有这个请求头时才添加
+                    If Not requestMessage.Headers.Contains(key) Then
+                        requestMessage.Headers.TryAddWithoutValidation(key, requestHeaders(key))
+                    End If
+                Next
+            'For Each header In requestHeaders
+            '                ' Post时不应该在此处设置content-type请求头
+            '                If method = Net2.HttpMethod.POST AndAlso header.Key.Equals("content-type", StringComparison.OrdinalIgnoreCase) Then
+            '                    Continue For
+            '                End If
 
-				'                ' 没有这个请求头时才添加
-				'                If Not requestMessage.Headers.Contains(header.Key) Then
-				'                    requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value)
-				'                End If
-				'            Next
-			End If
+            '                ' 没有这个请求头时才添加
+            '                If Not requestMessage.Headers.Contains(header.Key) Then
+            '                    requestMessage.Headers.TryAddWithoutValidation(header.Key, header.Value)
+            '                End If
+            '            Next
         End Sub
 
         ''' <summary>
@@ -557,12 +557,18 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function GetBrowserReallyHwnd(ByRef browser As WebBrowser) As IntPtr
-            Dim hwnd As IntPtr
-            hwnd = Win32API.UnsafeNativeMethods.FindWindowEx(browser.Handle, IntPtr.Zero, "Shell Embedding", Nothing)
-            hwnd = Win32API.UnsafeNativeMethods.FindWindowEx(hwnd, IntPtr.Zero, "Shell DocObject View", Nothing)
-            hwnd = Win32API.UnsafeNativeMethods.FindWindowEx(hwnd, IntPtr.Zero, "Internet Explorer_Server", Nothing)
+            Dim sbClassName As New StringBuilder(256)
+            Dim childHandle = GetWindow(browser.Handle, WindowType.GW_CHILD)
 
-            Return hwnd
+            Do While childHandle <> IntPtr.Zero
+                GetClassName(childHandle, sbClassName, sbClassName.Capacity)
+
+                If "Internet Explorer_Server" = sbClassName.ToString Then
+                    Return childHandle
+                End If
+
+                childHandle = GetWindow(childHandle, WindowType.GW_CHILD)
+            Loop
         End Function
     End Module
 End Namespace

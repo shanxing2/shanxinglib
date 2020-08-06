@@ -12,7 +12,9 @@
         ' some added, including .7z and .dat
 #End Region
 
-        Private Shared _mappings As New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase) From {
+        Private Shared ReadOnly _mappings As New Dictionary(Of String, String)
+        Shared Sub New()
+            _mappings = New Dictionary(Of String, String)(StringComparer.OrdinalIgnoreCase) From {
         {".323", "text/h323"},
         {".3g2", "video/3gpp2"},
         {".3gp", "video/3gpp"},
@@ -573,6 +575,7 @@
         {".z", "application/x-compress"},
         {".zip", "application/x-zip-compressed"}
     }
+        End Sub
 
         ''' <summary>
         ''' 获取文件的MIME

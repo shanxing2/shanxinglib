@@ -236,7 +236,7 @@ Namespace ShanXingTech.Win32API
 		''' <param name="lpClassName">窗体类名</param>
 		''' <param name="windowTitle">窗体标题</param>
 		''' <returns></returns>
-		<DllImport(ExternDll.User32, SetLastError:=True, CharSet:=CharSet.Unicode)>
+		<DllImport(ExternDll.User32, SetLastError:=True, CharSet:=CharSet.Auto)>
 		Public Function FindWindow(ByVal lpClassName As String,
 										 ByVal windowTitle As String) As IntPtr
 		End Function
@@ -248,8 +248,8 @@ Namespace ShanXingTech.Win32API
 		''' <param name="childAfter">子窗体句柄</param>
 		''' <param name="lpClassName">窗体类名</param>
 		''' <param name="windowTitle">窗体标题</param>
-		''' <returns></returns>
-		<DllImport(ExternDll.User32, SetLastError:=True, CharSet:=CharSet.Unicode)>
+		''' <returns>成功返回句柄，失败返回0</returns>
+		<DllImport(ExternDll.User32, SetLastError:=True, CharSet:=CharSet.Auto)>
 		Public Function FindWindowEx(ByVal parentHandle As IntPtr,
 										 ByRef childAfter As IntPtr,
 										 ByVal lpClassName As String,
@@ -519,6 +519,30 @@ Namespace ShanXingTech.Win32API
 		<DllImport(ExternDll.User32, SetLastError:=True)>
 		Public Function IsWindowEnabled(ByVal hWnd As IntPtr) As <MarshalAs(UnmanagedType.Bool)> Boolean
 		End Function
+
+		''' <summary>
+		''' Retrieves a handle to a window that has the specified relationship (Z-Order or owner) to the specified window.
+		''' </summary>
+		''' <remarks>The EnumChildWindows function is more reliable than calling GetWindow in a loop. An application that
+		''' calls GetWindow to perform this task risks being caught in an infinite loop or referencing a handle to a window
+		''' that has been destroyed.</remarks>
+		''' <param name="hWnd">A handle to a window. The window handle retrieved is relative to this window, based on the
+		''' value of the uCmd parameter.</param>
+		''' <param name="uCmd">The relationship between the specified window and the window whose handle is to be
+		''' retrieved.</param>
+		''' <returns>
+		''' If the function succeeds, the return value is a window handle. If no window exists with the specified relationship
+		''' to the specified window, the return value is NULL. To get extended error information, call GetLastError.
+		''' </returns>
+		<DllImport(ExternDll.User32, SetLastError:=True)>
+		Public Function GetWindow(hWnd As IntPtr, uCmd As WindowType) As IntPtr
+		End Function
+
+		<DllImport(ExternDll.User32, CharSet:=CharSet.Auto)>
+		Public Function GetClassName(ByVal hWnd As IntPtr, ByVal lpClassName As StringBuilder, ByVal nMaxCount As Integer) As Integer
+			' Leave function empty    
+		End Function
+
 
 		''' <summary>
 		''' 获取包含指定模块的文件的完全限定路径。

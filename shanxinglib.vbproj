@@ -141,6 +141,7 @@
     <Compile Include="Class\NET\UploadInfo.vb" />
     <Compile Include="Class\Win32API\EnumDefines\FlashWindow.vb" />
     <Compile Include="Class\Win32API\EnumDefines\MouseEventFlags.vb" />
+    <Compile Include="Class\Win32API\EnumDefines\WindowType.vb" />
     <Compile Include="Class\Win32API\StructureDefines\FLASHWINFO.vb" />
     <Compile Include="Class\Windows\Process.vb" />
     <Compile Include="Class\Text.vb" />

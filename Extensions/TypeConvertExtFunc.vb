@@ -931,56 +931,6 @@ Namespace ShanXingTech
         ''' <summary>
         ''' 字符串形式的键值对转换为集合。此函数与类库自带的函数 <see cref="Web.HttpUtility.ParseQueryString"/> 不同，不需要提前编码；如果值域包含特殊字符如“=、+”等，类库自带的函数 <see cref="Web.HttpUtility.ParseQueryString"/> 无法正常解析
         ''' </summary>
-        ''' <param name="sourceString"></param>
-        ''' <returns></returns>
-        <Extension()>
-        <Obsolete("请使用不带Old后缀的版本")>
-        Public Function ToKeyValuePairsOld(ByVal sourceString As String) As IEnumerable(Of KeyValuePair(Of String, String))
-            If sourceString Is Nothing Then
-                Throw New ArgumentNullException(String.Format(My.Resources.NullReference, NameOf(sourceString)))
-            ElseIf sourceString.Length = 0 Then
-                Return New Dictionary(Of String, String)
-            End If
-
-            Dim keyValuePairs As New Dictionary(Of String, String)(8)
-            Dim isValue As Boolean
-            Dim sbKey = StringBuilderCache.Acquire(32)
-            Dim sbValue = StringBuilderCache.Acquire(32)
-            Dim iSAndSymbol As Boolean
-
-            ' isg=dfdf&name=&msg==&1+1=2 测试通过
-            For i = 0 To sourceString.Length - 1
-                If "="c = sourceString.Chars(i) AndAlso Not isValue Then
-                    isValue = True
-                    Continue For
-                ElseIf "&"c = sourceString.Chars(i) AndAlso IsLetterNext(sourceString, i) Then
-                    iSAndSymbol = True
-                End If
-
-                If iSAndSymbol Then
-                    GetKvp(isValue, keyValuePairs, sbKey, sbValue)
-
-                    iSAndSymbol = False
-                    Continue For
-                End If
-
-                If isValue Then
-                    sbValue.Append(sourceString.Chars(i))
-                Else
-                    sbKey.Append(sourceString.Chars(i))
-                End If
-            Next
-
-            If sbKey.Length > 0 Then
-                GetKvp(isValue, keyValuePairs, sbKey, sbValue)
-            End If
-
-            Return keyValuePairs
-        End Function
-
-        ''' <summary>
-        ''' 字符串形式的键值对转换为集合。此函数与类库自带的函数 <see cref="Web.HttpUtility.ParseQueryString"/> 不同，不需要提前编码；如果值域包含特殊字符如“=、+”等，类库自带的函数 <see cref="Web.HttpUtility.ParseQueryString"/> 无法正常解析
-        ''' </summary>
         ''' <param name="kvString"></param>
         ''' <param name="urlEncoded"><paramref name="kvString"/> 是否已经编码</param>
         ''' <param name="encoding">指示 <paramref name="kvString"/> 采用的是何种编码，如果 <paramref name="kvString"/> 未编码，可传入 Nothing</param>
@@ -1069,9 +1019,7 @@ Namespace ShanXingTech
         <Extension()>
         Public Function IsLetterNext(ByVal sourceString As String, ByVal offset As Integer) As Boolean
             Dim nextOffset = offset + 1
-            Return If(sourceString.Length <= nextOffset,
-                False,
-                Char.IsLower(sourceString.Chars(nextOffset)) OrElse
+            Return sourceString.Length > nextOffset AndAlso (Char.IsLower(sourceString.Chars(nextOffset)) OrElse
             Char.IsUpper(sourceString.Chars(nextOffset)) OrElse
             "_"c = sourceString.Chars(nextOffset))
         End Function

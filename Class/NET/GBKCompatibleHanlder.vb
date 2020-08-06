@@ -73,7 +73,7 @@ Namespace ShanXingTech.Net2
 				End If
 
 				' 如果获取到的charSet为空的话，那就设置为默认的charSet
-				Return If(charSet, DefaultCharSet)
+				Return If(charSet, m_CharSet)
 			End Function
 		End Class
     End Class
