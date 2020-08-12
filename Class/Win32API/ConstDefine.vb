@@ -35,5 +35,10 @@
         Public Const MK_SHIFT = &H4
         Public Const WM_HOTKEY = &H312
         Public Const GWL_WNDPROC = (-4)
+        ''' <summary>
+        ''' Sets or removes the password character for an edit control. When a password character is set, that character is displayed in place of the characters typed by the user. You can send this message to either an edit control or a rich edit control.
+        ''' </summary>
+        Public Const EM_SETPASSWORDCHAR = &HCC
+        Public Const WM_NCACTIVATE = &H86
     End Module
 End Namespace
