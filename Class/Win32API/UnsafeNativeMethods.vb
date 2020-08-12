@@ -242,16 +242,16 @@ Namespace ShanXingTech.Win32API
 		End Function
 
 		''' <summary>
-		''' 查找窗口句柄（可获取子窗口句柄)
+		''' 在窗口列表中寻找与指定条件相符的第一个子窗口
 		''' </summary>
-		''' <param name="parentHandle">父窗体句柄</param>
-		''' <param name="childAfter">子窗体句柄</param>
-		''' <param name="lpClassName">窗体类名</param>
-		''' <param name="windowTitle">窗体标题</param>
+		''' <param name="parentHandle">要查找的子窗口所在的父窗口的句柄（如果设置了 <paramref name="parentHandle"/>，则表示从这个 <paramref name="parentHandle"/>指向的父窗口中搜索子窗口）。</param>
+		''' <param name="childAfter">子窗体句柄。查找从在Z序中的下一个子窗口开始。子窗口必须为 <paramref name="parentHandle"/> 窗口的直接子窗口而非后代窗口。如果<paramref name="childAfter"/> 为0，查找从 <paramref name="parentHandle"/> 的第一个子窗口开始。如果  <paramref name="parentHandle"/> 和 <paramref name="childAfter"/> 同时为0，则函数查找所有的顶层窗口及消息窗口。</param>
+		''' <param name="lpClassName">指向一个指定了类名的空结束字符串，或一个标识类名字符串的成员的指针。如果该参数为一个成员，则它必须为前次调用theGlobaIAddAtom函数产生的全局成员。该成员为16位，必须位于<paramref name="lpClassName"/> 的低16位，高位必须为0。</param>
+		''' <param name="windowTitle">指向一个指定了窗口名（窗口标题）的空结束字符串。如果该参数为 Nothing，则为所有窗口全匹配。</param>
 		''' <returns>成功返回句柄，失败返回0</returns>
 		<DllImport(ExternDll.User32, SetLastError:=True, CharSet:=CharSet.Auto)>
 		Public Function FindWindowEx(ByVal parentHandle As IntPtr,
-										 ByRef childAfter As IntPtr,
+										 ByVal childAfter As IntPtr,
 										 ByVal lpClassName As String,
 										 ByVal windowTitle As String) As IntPtr
 		End Function
