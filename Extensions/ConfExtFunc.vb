@@ -67,6 +67,7 @@ Namespace ShanXingTech
         Private Function GetProductInfo(ByVal instance As ConfBase) As (ProductName As String, IsCallByOwn As Boolean)
             Dim currentAssemblyName As String
             Dim topCallingAssemblyName As String
+
             ' 实例化前后的堆栈信息不一样，所以不能用一样的方法获取
             If instance Is Nothing Then
                 Dim st = New StackTrace
@@ -74,12 +75,12 @@ Namespace ShanXingTech
                     Throw New TypeInitializationException(NameOf(instance), New Exception($"不支持的继承深度，只支持从 {NameOf(ConfBase)} 继承的类调用此辅助工具。"))
                 End If
                 currentAssemblyName = st.GetFrames(0).GetMethod.DeclaringType.Assembly.GetName.Name
-                topCallingAssemblyName = st.GetFrames(2).GetMethod.DeclaringType.Assembly.GetName.Name
             Else
-                Dim t = instance.GetType
                 currentAssemblyName = Reflection.Assembly.GetExecutingAssembly.GetName.Name
-                topCallingAssemblyName = t.Assembly.GetName.Name
             End If
+            Dim asm = Reflection.Assembly.GetEntryAssembly
+            ' 当处于设计模式时，asm 可能会返回 Nothing
+            topCallingAssemblyName = If(asm Is Nothing, String.Empty, asm.GetName.Name)
 
             ' 如果程序集名一样，说明是类库自身 Conf 调用,需要加上入口程序集的名称，这样每个调用类库的程序都会有一个属于自己的conf文件，而不是共享
             ' 如果需要所有程序共享类库设置，那就直接返回 currentAssemblyName 即可

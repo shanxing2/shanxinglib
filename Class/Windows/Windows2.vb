@@ -4,6 +4,7 @@ Imports System.Threading
 Imports System.Threading.Tasks
 Imports System.Windows.Forms
 
+Imports ShanXingTech.Text2
 Imports ShanXingTech.Win32API
 Imports ShanXingTech.Win32API.UnsafeNativeMethods
 
@@ -448,6 +449,50 @@ Namespace ShanXingTech
             fInfo.dwTimeout = 0
 
             Return Win32API.FlashWindowEx(fInfo)
+        End Function
+
+        ''' <summary>
+        ''' CMD执行命令并返回结果
+        ''' </summary>
+        ''' <param name="command"></param>
+        ''' <returns></returns>
+        Public Shared Function CmdRun(ByVal command As String) As String
+            Dim procStartInfo = New ProcessStartInfo("cmd.exe", "/c " & command) With {
+                .RedirectStandardOutput = True,
+                .UseShellExecute = False,
+                .CreateNoWindow = True
+            }
+
+            Dim proc = New Process() With {
+                .StartInfo = procStartInfo
+            }
+
+            Dim sb = StringBuilderCache.Acquire(360)
+            Dim readToEnd As Boolean
+
+            Try
+                proc.Start()
+                proc.BeginOutputReadLine()
+
+                AddHandler proc.OutputDataReceived,
+                  Sub(sender, e)
+                      sb.AppendLine(e.Data)
+                      If e.Data Is Nothing Then
+                          readToEnd = True
+                      End If
+                  End Sub
+
+                While Not readToEnd
+                    Windows2.Delay(1)
+                End While
+            Catch ex As Exception
+                Logger.WriteLine(ex)
+            End Try
+
+            'Dim result = proc.StandardOutput.ReadToEnd().Replace("UUID", String.Empty).Trim
+            Dim result = If(sb.Length = 0, String.Empty, StringBuilderCache.GetStringAndReleaseBuilder(sb))
+
+            Return result
         End Function
     End Class
 End Namespace
