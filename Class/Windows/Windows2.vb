@@ -494,6 +494,29 @@ Namespace ShanXingTech
 
             Return result
         End Function
+
+        ''' <summary>
+        ''' 获取 <see cref="InputBox(String, String, String, Integer, Integer)"/> 函数弹框中输入框的句柄
+        ''' </summary>
+        ''' <param name="inputBoxHandle"><see cref="InputBox(String, String, String, Integer, Integer)"/> 函数弹框 的句柄</param>
+        ''' <returns></returns>
+        Public Shared Function GetInputBoxEditHandle(ByVal inputBoxHandle As IntPtr) As IntPtr
+            ' "WindowsForms10.EDIT.app.0.141b42a_r8_ad1",
+            Dim sbClassName = StringBuilderCache.Acquire(256)
+            Dim childHandle = Win32API.GetWindow(inputBoxHandle, Win32API.WindowType.GW_CHILD)
+
+            Do While childHandle <> IntPtr.Zero
+                Win32API.GetClassName(childHandle, sbClassName, sbClassName.Capacity)
+
+                If StringBuilderCache.GetStringAndReleaseBuilder(sbClassName).IsMatch("WindowsForms\d+\.EDIT\.app\.0\.[a-z0-9_]+") Then
+                    Return childHandle
+                End If
+
+                childHandle = Win32API.GetWindow(childHandle, Win32API.WindowType.GW_CHILD)
+            Loop
+
+            Return childHandle
+        End Function
     End Class
 End Namespace
 

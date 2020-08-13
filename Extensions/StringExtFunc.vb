@@ -791,18 +791,57 @@ Namespace ShanXingTech
         ''' <param name="pattern"></param>
         ''' <returns></returns>
         <Extension()>
-        Public Function GetFirstMatchValue(ByVal input As String, ByVal pattern As String) As String
+        Public Function GetFirstMatchValue(ByVal input As String, ByVal pattern As String, ByVal options As RegexOptions) As String
             If input.IsNullOrEmpty Then
-                Throw New NullReferenceException(String.Format(My.Resources.NullReference， NameOf(input)))
+                Return String.Empty
             End If
 
-            Dim match = Regex.Match(input, pattern, RegexOptions.IgnoreCase Or RegexOptions.Compiled)
+            Dim match = Regex.Match(input, pattern, options)
             If match.Success Then
                 Dim funcRst = match.Groups(1).Value
                 Return funcRst
             Else
                 Return String.Empty
             End If
+        End Function
+
+        ''' <summary>
+        ''' 获取第一个匹配组的值,匹配选项默认为 <see cref="RegexOptions.Compiled"/> Or <see cref="RegexOptions.IgnoreCase"/>
+        ''' </summary>
+        ''' <param name="input"></param>
+        ''' <param name="pattern"></param>
+        ''' <returns></returns>
+        <Extension()>
+        Public Function GetFirstMatchValue(ByVal input As String, ByVal pattern As String) As String
+            Return GetFirstMatchValue(input, pattern, RegexOptions.IgnoreCase Or RegexOptions.Compiled)
+        End Function
+
+
+        ''' <summary>
+        ''' 正则检测字符串 <paramref name="input"/> 是否匹配 <paramref name="pattern"/>
+        ''' </summary>
+        ''' <param name="input">待检测字符串</param>
+        ''' <param name="pattern">匹配表达式</param>
+        ''' <param name="options">匹配选项</param>
+        ''' <returns></returns>
+        <Extension()>
+        Public Function IsMatch(ByVal input As String, ByVal pattern As String, ByVal options As RegexOptions) As Boolean
+            If input.IsNullOrEmpty Then
+                Return False
+            End If
+
+            Return Regex.IsMatch(input, pattern, options)
+        End Function
+
+        ''' <summary>
+        ''' 正则检测字符串 <paramref name="input"/> 是否匹配 <paramref name="pattern"/>,匹配选项默认为 <see cref="RegexOptions.Compiled"/> Or <see cref="RegexOptions.IgnoreCase"/>
+        ''' </summary>
+        ''' <param name="input">待检测字符串</param>
+        ''' <param name="pattern">匹配表达式</param>
+        ''' <returns></returns>
+        <Extension()>
+        Public Function IsMatch(ByVal input As String, ByVal pattern As String) As Boolean
+            Return IsMatch(input, pattern, RegexOptions.IgnoreCase Or RegexOptions.Compiled)
         End Function
 
         ''' <summary>

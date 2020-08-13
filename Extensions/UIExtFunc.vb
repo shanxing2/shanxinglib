@@ -1,6 +1,9 @@
 ﻿Imports System.Drawing
 Imports System.Runtime.CompilerServices
+Imports System.Text.RegularExpressions
 Imports System.Windows.Forms
+
+Imports ShanXingTech.Text2
 Imports ShanXingTech.Win32API
 
 Namespace ShanXingTech
@@ -718,42 +721,42 @@ Namespace ShanXingTech
             Return AdjustDgv(dgv, showLastColumn, DataGridViewAutoSizeColumnsMode.DisplayedCells)
         End Function
 
-		''' <summary>
-		''' 调整DataGridView控件 
-		''' 1.添加列标题 
-		''' 2.标题居中 
-		''' 3.设置列宽自动调整模为 AllCells 列宽调整到适合位于屏幕上当前显示的行中的列的所有单元格（包括标头单元格）的内容。
-		''' 4.不允许用户手动编辑 及新增删除行 只读
-		''' </summary>
-		''' <param name="dgv"></param>
-		<Extension()>
-		Public Function AdjustDgv(Of T As DataGridView)(ByRef dgv As T) As Boolean
-			Return AdjustDgv(dgv, True)
-		End Function
+        ''' <summary>
+        ''' 调整DataGridView控件 
+        ''' 1.添加列标题 
+        ''' 2.标题居中 
+        ''' 3.设置列宽自动调整模为 AllCells 列宽调整到适合位于屏幕上当前显示的行中的列的所有单元格（包括标头单元格）的内容。
+        ''' 4.不允许用户手动编辑 及新增删除行 只读
+        ''' </summary>
+        ''' <param name="dgv"></param>
+        <Extension()>
+        Public Function AdjustDgv(Of T As DataGridView)(ByRef dgv As T) As Boolean
+            Return AdjustDgv(dgv, True)
+        End Function
 
-		''' <summary>
-		''' Flashes a window（Not control） until the window comes to the foreground
-		''' Receives the form that will flash
-		''' </summary>
-		''' <param name="form">the window to flash</param>
-		''' <returns>whether or not the window needed flashing</returns>
-		<Extension()>
-		Public Function FlashWindowEx(ByVal form As Form) As Boolean
-			Return FlashWindowEx(form, FlashWindow.FLASHW_ALL Or FlashWindow.FLASHW_TIMERNOFG)
-		End Function
+        ''' <summary>
+        ''' Flashes a window（Not control） until the window comes to the foreground
+        ''' Receives the form that will flash
+        ''' </summary>
+        ''' <param name="form">the window to flash</param>
+        ''' <returns>whether or not the window needed flashing</returns>
+        <Extension()>
+        Public Function FlashWindowEx(ByVal form As Form) As Boolean
+            Return FlashWindowEx(form, FlashWindow.FLASHW_ALL Or FlashWindow.FLASHW_TIMERNOFG)
+        End Function
 
-		''' <summary>
-		''' Flashes a window（Not control） until the window comes to the foreground
-		''' Receives the form that will flash.
-		''' FLASHWINFO.uCount default value is UInteger.MaxValue.
-		''' </summary>
-		''' <param name="form">the window to flash</param>
-		''' <param name="dwFlags">The flash status of the window</param>
-		''' <returns>whether or not the window needed flashing</returns>
-		<Extension()>
-		Public Function FlashWindowEx(ByVal form As Form, ByVal dwFlags As FlashWindow) As Boolean
-			Return FlashWindowEx(form, dwFlags, Integer.MaxValue)
-		End Function
+        ''' <summary>
+        ''' Flashes a window（Not control） until the window comes to the foreground
+        ''' Receives the form that will flash.
+        ''' FLASHWINFO.uCount default value is UInteger.MaxValue.
+        ''' </summary>
+        ''' <param name="form">the window to flash</param>
+        ''' <param name="dwFlags">The flash status of the window</param>
+        ''' <returns>whether or not the window needed flashing</returns>
+        <Extension()>
+        Public Function FlashWindowEx(ByVal form As Form, ByVal dwFlags As FlashWindow) As Boolean
+            Return FlashWindowEx(form, dwFlags, Integer.MaxValue)
+        End Function
 
         ''' <summary>
         ''' Flashes a window（Not control） until the window comes to the foreground

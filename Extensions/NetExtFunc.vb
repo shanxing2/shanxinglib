@@ -551,24 +551,34 @@ Namespace ShanXingTech
         End Sub
 
         ''' <summary>
-        ''' 获取内置webbrowser控件的真正句柄（webbrowser.Handle获取到的句柄是经过封装的外层句柄，并不能用来操作webbrowser内的内容，比如弹窗）
+        ''' 获取内置 <see cref="WebBrowser"/> 控件的真正句柄（<see cref="WebBrowser.Handle"/> 获取到的句柄是经过封装的外层句柄，并不能用来操作 <see cref="WebBrowser"/> 内的内容，比如弹窗）。
+        ''' 注：必须等 <see cref="WebBrowser"/> 加载完毕之后才能获取。
         ''' </summary>
         ''' <param name="browser"></param>
         ''' <returns></returns>
         <Extension()>
         Public Function GetBrowserReallyHwnd(ByRef browser As WebBrowser) As IntPtr
-            Dim sbClassName As New StringBuilder(256)
-            Dim childHandle = GetWindow(browser.Handle, WindowType.GW_CHILD)
+            ' 方法一
+            'Dim sbClassName As New StringBuilder(256)
+            'Dim childHandle = GetWindow(browser.Handle, WindowType.GW_CHILD)
 
-            Do While childHandle <> IntPtr.Zero
-                GetClassName(childHandle, sbClassName, sbClassName.Capacity)
+            'Do While childHandle <> IntPtr.Zero
+            '    GetClassName(childHandle, sbClassName, sbClassName.Capacity)
 
-                If "Internet Explorer_Server" = sbClassName.ToString Then
-                    Return childHandle
-                End If
+            '    If "Internet Explorer_Server" = sbClassName.ToString Then
+            '        Return childHandle
+            '    End If
 
-                childHandle = GetWindow(childHandle, WindowType.GW_CHILD)
-            Loop
+            '    childHandle = GetWindow(childHandle, WindowType.GW_CHILD)
+            'Loop
+            ' 方法二
+            Dim childHandle = FindWindowEx(browser.Handle, IntPtr.Zero, "Shell Embedding", Nothing)
+            If IntPtr.Zero = childHandle Then Return IntPtr.Zero
+            childHandle = FindWindowEx(childHandle, IntPtr.Zero, "Shell DocObject View", Nothing)
+            If IntPtr.Zero = childHandle Then Return IntPtr.Zero
+            childHandle = FindWindowEx(childHandle, IntPtr.Zero, "Internet Explorer_Server", Nothing)
+
+            Return childHandle
         End Function
     End Module
 End Namespace

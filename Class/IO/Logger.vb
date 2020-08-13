@@ -56,7 +56,9 @@ Namespace ShanXingTech
 
 		Private Shared Function MakeLogString(ByVal logString As String, <CallerMemberName> Optional callerMemberName As String = Nothing, <CallerFilePath> Optional callerFilePath As String = Nothing, <CallerLineNumber()> Optional callerLineNumber As Integer = 0) As String
 			' 构造输出日记信息
-			Dim stackInfo = $"   Time：{Date.Now.ToString(m_DateFormat)}{Environment.NewLine}{My.Resources.CallSubName.PadLeftByByte(9)}{callerFilePath} {callerMemberName} {My.Resources.FileLineNumber}{callerLineNumber}"
+			' 来源只显示文件名，不显示具体路径
+			Dim fileName = IO.Path.GetFileName(callerFilePath)
+			Dim stackInfo = $"   Time：{Date.Now.ToString(m_DateFormat)}{Environment.NewLine}{My.Resources.CallSubName.PadLeftByByte(9)}{If(fileName.IsNullOrEmpty, callerFilePath, fileName)} {callerMemberName} {My.Resources.FileLineNumber}{callerLineNumber}"
 			Dim logWriteString = $"{stackInfo}{Environment.NewLine}{My.Resources.ProblemDescription}{logString}{Environment.NewLine}"
 
 			Return logWriteString

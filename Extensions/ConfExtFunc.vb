@@ -20,7 +20,7 @@ Namespace ShanXingTech
                 If json.Length = 0 Then Return
 
                 Dim productInfo = GetProductInfo(instance)
-                Dim confPath = GetProductConfPath(productInfo.ProductName, productInfo.IsCallByOwn)
+                Dim confPath = GetProductConfFileFullPath(productInfo.ProductName, productInfo.IsCallByOwn)
                 IO2.Writer.WriteText(confPath, json, IO.FileMode.Create, IO2.CodePage.UTF8)
             Catch ex As Exception
                 Throw
@@ -35,7 +35,7 @@ Namespace ShanXingTech
         <Extension>
         Public Function GetLocalInstanceSerialization(ByVal instance As ConfBase) As String
             Dim productInfo = GetProductInfo(instance)
-            Dim confPath = GetProductConfPath(productInfo.ProductName, productInfo.IsCallByOwn)
+            Dim confPath = GetProductConfFileFullPath(productInfo.ProductName, productInfo.IsCallByOwn)
 
             If Not IO.Directory.Exists(confPath) Then
                 IO2.Directory.Create(confPath)
@@ -54,7 +54,7 @@ Namespace ShanXingTech
         ''' <param name="productName"></param>
         ''' <param name="isCallByOwn">是否自己调用自己，或者是其他程序集调用</param>
         ''' <returns></returns>
-        Private Function GetProductConfPath(ByVal productName As String, ByVal isCallByOwn As Boolean) As String
+        Private Function GetProductConfFileFullPath(ByVal productName As String, ByVal isCallByOwn As Boolean) As String
             ' 最终路径 C:\ProgramData\ShanXingTech\{产品名}\conf.json
             Dim confPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)
             confPath = If("\"c = confPath.Chars(confPath.Length - 1),
@@ -62,6 +62,19 @@ Namespace ShanXingTech
            $"{confPath}\ShanXingTech\{productName}{If(isCallByOwn, "_", "\")}conf.conf")
 
             Return confPath
+        End Function
+
+        ''' <summary>
+        ''' 获取 Conf 存储目录
+        ''' </summary>
+        ''' <param name="instance"></param>
+        ''' <returns></returns>
+        <Extension>
+        Public Function GetConfPath(ByVal instance As ConfBase) As String
+            Dim productInfo = GetProductInfo(instance)
+            Dim confPath = GetProductConfFileFullPath(productInfo.ProductName, productInfo.IsCallByOwn)
+
+            Return IO.Path.GetDirectoryName(confPath)
         End Function
 
         Private Function GetProductInfo(ByVal instance As ConfBase) As (ProductName As String, IsCallByOwn As Boolean)
@@ -101,7 +114,7 @@ Namespace ShanXingTech
         Public Function TryRemoveLocalConf(ByVal instance As ConfBase) As Boolean
             Try
                 Dim productInfo = GetProductInfo(instance)
-                Dim confPath = GetProductConfPath(productInfo.ProductName, productInfo.IsCallByOwn)
+                Dim confPath = GetProductConfFileFullPath(productInfo.ProductName, productInfo.IsCallByOwn)
                 If IO.File.Exists(confPath) Then
                     IO.File.Delete(confPath)
                 End If
