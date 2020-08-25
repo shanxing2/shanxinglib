@@ -30,7 +30,9 @@ Namespace ShanXingTech
 		''' <param name="callerLineNumber"></param>
 		''' <returns></returns>
 		Public Shared Function MakeDebugString(ByVal logString As String, <CallerMemberName> Optional callerMemberName As String = Nothing, <CallerFilePath> Optional callerFilePath As String = Nothing, <CallerLineNumber()> Optional callerLineNumber As Integer = 0) As String
-			Dim debugString = $"Time：{Date.Now.ToString(m_DateFormat)} {My.Resources.CallSubName}{If(callerFilePath, String.Empty)} {callerMemberName} {My.Resources.FileLineNumber}{callerLineNumber}    {logString}"
+			' 来源只显示文件名，不显示具体路径
+			Dim fileName = IO.Path.GetFileName(callerFilePath)
+			Dim debugString = $"Time：{Date.Now.ToString(m_DateFormat)} {My.Resources.CallSubName}{If(fileName.IsNullOrEmpty, callerFilePath, fileName)} {callerMemberName} {My.Resources.FileLineNumber}{callerLineNumber}    {logString}"
 
 			Return debugString
 		End Function

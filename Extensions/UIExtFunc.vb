@@ -642,7 +642,6 @@ Namespace ShanXingTech
                         dgv.Columns.AddRange(appendColumns)
                     End If
 
-                    ' 不需要排序（去掉小三角 小三角会影响列宽）
                     For Each col As DataGridViewColumn In .Columns
                         col.SortMode = sortMode
                     Next col
@@ -799,6 +798,133 @@ Namespace ShanXingTech
         Public Function IsClickedPlusMinus(ByVal e As TreeNodeMouseClickEventArgs) As Boolean
             Return e.Location.X >= 6 AndAlso e.Location.X <= 21
         End Function
+
+        ''' <summary>
+        ''' 参数 <paramref name="markColor"/> 的值为 True时，行号为 <paramref name="rowIndex"/>，列号为 <paramref name="colIndex"/> 的单元格背景设置成HotPink
+        ''' </summary>
+        ''' <param name="dgv"></param>
+        ''' <param name="rowIndex"></param>
+        ''' <param name="colIndex"></param>
+        ''' <param name="markColor"></param>
+        <Extension()>
+        Public Sub SetCellsBackColor(ByVal dgv As DataGridView, ByVal rowIndex As Integer, ByVal colIndex As Integer, ByVal markColor As Boolean)
+            If markColor Then
+                dgv.Rows(rowIndex).Cells(colIndex).Style.BackColor = Color.HotPink
+                dgv.Rows(rowIndex).Cells(colIndex).Style.ForeColor = Color.White
+            Else
+                dgv.Rows(rowIndex).Cells(colIndex).Style.BackColor = Color.White
+                dgv.Rows(rowIndex).Cells(colIndex).Style.ForeColor = Color.Black
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' 行号为 <paramref name="rowIndex"/>  的单元格值小于等于 <paramref name="compareValue"/> 时，单元格背景设置成HotPink
+        ''' </summary>
+        ''' <param name="dgv"></param>
+        ''' <param name="rowIndex"></param>
+        ''' <param name="colIndex"></param>
+        ''' <param name="compareValue"></param>
+        <Extension()>
+        Public Sub SetCellsBackColor(ByVal dgv As DataGridView, ByVal rowIndex As Integer, ByVal colIndex As Integer， ByVal compareValue As Integer)
+            If (dgv.RowCount = 1 AndAlso dgv.Rows(0).Cells(1).Value Is Nothing) OrElse dgv.RowCount = 0 Then
+                '
+            Else
+                Dim value = dgv.Rows(rowIndex).Cells(colIndex).Value
+                If value IsNot DBNull.Value AndAlso
+                    CInt(value) <= compareValue Then
+                    dgv.Rows(rowIndex).Cells(colIndex).Style.BackColor = Color.HotPink
+                    dgv.Rows(rowIndex).Cells(colIndex).Style.ForeColor = Color.White
+                Else
+                    dgv.Rows(rowIndex).Cells(colIndex).Style.BackColor = Color.White
+                    dgv.Rows(rowIndex).Cells(colIndex).Style.ForeColor = Color.Black
+                End If
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' 当<paramref name="compare"/> 为条件成立时，列号为 <paramref name="colIndex"/> 的所有行的单元格背景设置成HotPink
+        ''' </summary>
+        ''' <param name="dgv"></param>
+        ''' <param name="colIndex"></param>
+        ''' <param name="compare"></param>
+        <Extension()>
+        Public Sub SetCellsBackColor(Of T)(ByVal dgv As DataGridView, ByVal colIndex As Integer， ByVal compare As Func(Of Object, T, Boolean), ByVal compareValue As T)
+            If (dgv.RowCount = 1 AndAlso dgv.Rows(0).Cells(1).Value Is Nothing) OrElse dgv.RowCount = 0 Then
+                '
+            Else
+                Dim rowIndex = 0
+                While rowIndex < dgv.RowCount
+                    Dim value = dgv.Rows(rowIndex).Cells(colIndex).Value
+
+                    If value IsNot DBNull.Value AndAlso compare(value, compareValue) Then
+                        dgv.Rows(rowIndex).Cells(colIndex).Style.BackColor = Color.HotPink
+                        dgv.Rows(rowIndex).Cells(colIndex).Style.ForeColor = Color.White
+                    Else
+                        dgv.Rows(rowIndex).Cells(colIndex).Style.BackColor = Color.White
+                        dgv.Rows(rowIndex).Cells(colIndex).Style.ForeColor = Color.Black
+                    End If
+
+                    rowIndex += 1
+                End While
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' 所有行，列号为 <paramref name="colIndex"/> 的单元格值等于-1时，单元格背景设置成HotPink
+        ''' </summary>
+        ''' <param name="dgv"></param>
+        ''' <param name="colIndex"></param>
+        <Extension()>
+        Public Sub SetCellsBackColor(ByVal dgv As DataGridView, ByVal colIndex As Integer)
+            If (dgv.RowCount = 1 AndAlso dgv.Rows(0).Cells(1).Value Is Nothing) OrElse dgv.RowCount = 0 Then
+                '
+            Else
+                Dim rowIndex = 0
+                While rowIndex < dgv.RowCount
+                    Dim value = dgv.Rows(rowIndex).Cells(colIndex).Value
+                    If value IsNot DBNull.Value AndAlso
+                        CStr(value) = "-1" Then
+                        dgv.Rows(rowIndex).Cells(colIndex).Style.BackColor = Color.HotPink
+                        dgv.Rows(rowIndex).Cells(colIndex).Style.ForeColor = Color.White
+                    Else
+                        dgv.Rows(rowIndex).Cells(colIndex).Style.BackColor = Color.White
+                        dgv.Rows(rowIndex).Cells(colIndex).Style.ForeColor = Color.Black
+                    End If
+
+                    rowIndex += 1
+                End While
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' 所有行，列号为 <paramref name="colIndex"/> 的单元格值等于 <paramref name="compareValue"/> 时，单元格背景设置成HotPink
+        ''' </summary>
+        ''' <typeparam name="T"></typeparam>
+        ''' <param name="dgv"></param>
+        ''' <param name="colIndex"></param>
+        ''' <param name="compareValue"></param>
+        <Extension()>
+        Public Sub SetCellsBackColor(Of T)(ByVal dgv As DataGridView, ByVal colIndex As Integer， ByVal compareValue As T)
+            If (dgv.RowCount = 1 AndAlso dgv.Rows(0).Cells(1).Value Is Nothing) OrElse dgv.RowCount = 0 Then
+                '
+            Else
+                Dim rowIndex = 0
+                While rowIndex < dgv.RowCount
+                    Dim value = dgv.Rows(rowIndex).Cells(colIndex).Value
+                    If value IsNot DBNull.Value AndAlso
+                        CType(value, T).Equals(compareValue) Then
+                        dgv.Rows(rowIndex).Cells(colIndex).Style.BackColor = Color.HotPink
+                        dgv.Rows(rowIndex).Cells(colIndex).Style.ForeColor = Color.White
+                    Else
+                        dgv.Rows(rowIndex).Cells(colIndex).Style.BackColor = Color.White
+                        dgv.Rows(rowIndex).Cells(colIndex).Style.ForeColor = Color.Black
+                    End If
+
+                    rowIndex += 1
+                End While
+            End If
+        End Sub
+
 #End Region
 
     End Module

@@ -18,6 +18,8 @@ Namespace ShanXingTech.Cryptography
 
             ' 先获取主板UUID
             Dim uuid = Windows2.CmdRun("wmic csproduct get UUID")
+            ' 注，有些电脑会返回 ’03000200-0400-0500-0006-000700080009‘，这个可能是重复的，
+            ' 没有uuid的全部是F
 
             ' 再获取COM GUID
             Dim guidId As String
@@ -33,6 +35,9 @@ Namespace ShanXingTech.Cryptography
             Else
                 guidId = uuid.Replace("UUID", String.Empty).Trim
             End If
+
+            ' uuid后再添加 计算机名
+            guidId &= "_" & Environment.MachineName.GetHashCode
 
             s_RegistInfoFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)
             If Not "\"c = s_RegistInfoFolder.Chars(s_RegistInfoFolder.Length - 1) Then
