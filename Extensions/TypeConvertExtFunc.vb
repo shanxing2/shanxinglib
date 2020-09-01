@@ -171,6 +171,8 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Async Function CompressAsync(buffer As Byte()) As Task(Of Byte())
+            If buffer Is Nothing OrElse buffer.Length = 0 Then Return buffer
+
             Dim compressBytes() As Byte
             Dim dms As New MemoryStream(buffer)
             Dim cms As New MemoryStream()
@@ -203,6 +205,8 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Async Function DeCompressAsync(buffer As Byte()) As Task(Of Byte())
+            If buffer Is Nothing OrElse buffer.Length = 0 Then Return buffer
+
             If buffer.Length < 2 Then
                 Return buffer
             End If
@@ -247,6 +251,8 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function Compress(buffer As Byte()) As Byte()
+            If buffer Is Nothing OrElse buffer.Length = 0 Then Return buffer
+
             Dim compressBytes() As Byte
             Dim dms As New MemoryStream(buffer)
             Dim cms As New MemoryStream()
@@ -279,6 +285,8 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function DeCompress(buffer As Byte()) As Byte()
+            If buffer Is Nothing OrElse buffer.Length = 0 Then Return buffer
+
             If buffer.Length < 2 Then
                 Return buffer
             End If
@@ -1079,10 +1087,11 @@ Namespace ShanXingTech
         ''' <typeparam name="T"></typeparam>
         ''' <param name="instance"></param>
         ''' <param name="nameOfInstance">对象名，可用 NamoOf 获取</param>
+        ''' <returns>成功返回二进制文件存储路径,失败返回 <see cref="String.Empty"/></returns>
         <Extension()>
-        Public Sub BinarySerialize(Of T As Class)(ByVal instance As T, ByVal nameOfInstance As String)
+        Public Function BinarySerialize(Of T As Class)(ByVal instance As T, ByVal nameOfInstance As String) As String
             Try
-                If instance Is Nothing Then Return
+                If instance Is Nothing Then Return String.Empty
 
                 Dim objType = instance.GetType
                 Dim filePath As String = $"{nameOfInstance}_{objType.Name}.bs"
@@ -1090,10 +1099,14 @@ Namespace ShanXingTech
                     Dim bf As New BinaryFormatter()
                     bf.Serialize(fs, instance)
                 End Using
+
+                Return filePath
             Catch ex As Exception
                 Logger.WriteLine(ex)
             End Try
-        End Sub
+
+            Return String.Empty
+        End Function
 
         ''' <summary>
         ''' 将二进制反序列化为对象

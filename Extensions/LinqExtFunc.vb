@@ -42,7 +42,8 @@ Namespace ShanXingTech
             If memberProp Is Nothing Then
                 Throw New ArgumentOutOfRangeException($"'{propertyName}'不属于'{query.ToString}'的成员")
             End If
-            Dim method = GetType(ExtensionFunc).GetMethod(methodname).MakeGenericMethod(GetType(T), memberProp.PropertyType)
+            ' OrderByDescendingInternal 和 OrderByInternal 是内部静态方法，必须用带着两个标记参数的重装，没有标记的重载获取不到
+            Dim method = GetType(ExtensionFunc).GetMethod(methodname, Reflection.BindingFlags.NonPublic Or Reflection.BindingFlags.Static).MakeGenericMethod(GetType(T), memberProp.PropertyType)
 
             Return CType(method.Invoke(Nothing, New Object() {query, memberProp}), IOrderedQueryable(Of T))
         End Function

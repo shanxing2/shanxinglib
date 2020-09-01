@@ -444,7 +444,7 @@ Namespace ShanXingTech.Net2
         ''' <param name="requestHeaders">请求头集合。类库内部默认的 ContentType 头值为 <see cref="DefaulMediaType"/> 。若请求头不区分大小写，请使用带有 <see cref="IEqualityComparer(Of T)"/> 的重载来实例化集合。</param>
         ''' <param name="postContentKvp">请求主体键值对集合，不需要编码，直接原字符串传入</param>
         ''' <param name="postContentEncoding">请求主体的编码方式，必须跟抓包的一致，否则可能会导致乱码</param>
-        ''' <returns></returns>
+        ''' <returns>注：如果同样的包，其他工具返回结果正常，本工具返回异常，请检查编码以及cookie的域</returns>
         Public Async Function InternalPostAsync(ByVal url As String, ByVal requestHeaders As Dictionary(Of String, String), ByVal postContentKvp As IEnumerable(Of KeyValuePair(Of String, String)), ByVal postContentEncoding As Text.Encoding) As Task(Of HttpResponse)
             Dim httpResponse As HttpResponse
             Dim cts As CancellationTokenSource
@@ -966,7 +966,7 @@ Namespace ShanXingTech.Net2
         ''' <param name="requestHeaders">请求头集合。类库内部默认的 ContentType 头值为 <see cref="DefaulMediaType"/> 。若请求头不区分大小写，请使用带有 <see cref="IEqualityComparer(Of T)"/> 的重载来实例化集合。</param>
         ''' <param name="postContent">请求主体，不需要编码，直接原字符串传入。如果传入有包含编码的数据，可能会导致乱码或者数据丢失</param>
         ''' <param name="postContentEncoding">>请求主体的编码方式，必须跟抓包的一致，否则可能会导致乱码</param>
-        ''' <returns></returns>
+        ''' <returns>注：如果同样的包，其他工具返回结果正常，本工具返回异常，请检查编码以及cookie的域</returns>
         Public Async Function PostAsync(ByVal url As String, ByVal requestHeaders As Dictionary(Of String, String), ByVal postContent As String, ByVal postContentEncoding As Text.Encoding) As Task(Of HttpResponse)
             Return Await InternalPostAsync(url, requestHeaders, postContent.ToKeyValuePairs, postContentEncoding)
         End Function
@@ -977,7 +977,7 @@ Namespace ShanXingTech.Net2
         ''' <param name="url"></param>
         ''' <param name="requestHeaders">请求头集合。类库内部默认的 ContentType 头值为 <see cref="DefaulMediaType"/> 。若请求头不区分大小写，请使用带有 <see cref="IEqualityComparer(Of T)"/> 的重载来实例化集合。</param>
         ''' <param name="postContent">请求主体，不需要编码，直接原字符串传入；内部默认使用UTF-8编码，如果抓包得到的不是UTF-8编码，请调用可以自定义编码方式的重载函数</param>
-        ''' <returns></returns>
+        ''' <returns>注：如果同样的包，其他工具返回结果正常，本工具返回异常，请检查编码以及cookie的域</returns>
         Public Async Function PostAsync(ByVal url As String, ByVal requestHeaders As Dictionary(Of String, String), ByVal postContent As String) As Task(Of HttpResponse)
             Return Await PostAsync(url, requestHeaders, postContent, Text.Encoding.UTF8)
         End Function
@@ -990,7 +990,7 @@ Namespace ShanXingTech.Net2
         ''' <param name="postContent">请求主体，不需要编码，直接原字符串传入。如果传入有包含编码的数据，可能会导致乱码或者数据丢失</param>
         ''' <param name="postContentEncoding">请求主体的编码方式，必须跟抓包的一致，否则可能会导致乱码</param>
         ''' <param name="tryTime">尝试次数。成功会立刻返回，失败会继续尝试直到用完尝试次数</param> 
-        ''' <returns></returns>
+        ''' <returns>注：如果同样的包，其他工具返回结果正常，本工具返回异常，请检查编码以及cookie的域</returns>
         Public Async Function TryPostAsync(ByVal url As String, ByVal requestHeaders As Dictionary(Of String, String), ByVal postContent As String, ByVal postContentEncoding As Text.Encoding, tryTime As Integer) As Task(Of HttpResponse)
             Dim httpResponse As HttpResponse
 
@@ -1009,7 +1009,7 @@ Namespace ShanXingTech.Net2
         ''' <param name="requestHeaders">请求头集合。类库内部默认的 ContentType 头值为 <see cref="DefaulMediaType"/> 。若请求头不区分大小写，请使用带有 <see cref="IEqualityComparer(Of T)"/> 的重载来实例化集合。</param>
         ''' <param name="postContent">请求主体，不需要编码，直接原字符串传入；内部默认使用UTF-8编码，如果抓包得到的不是UTF-8编码，请调用可以自定义编码方式的重载函数</param>
         ''' <param name="tryTime">尝试次数。成功会立刻返回，失败会继续尝试直到用完尝试次数</param>
-        ''' <returns></returns>
+        ''' <returns>注：如果同样的包，其他工具返回结果正常，本工具返回异常，请检查编码以及cookie的域</returns>
         Public Async Function TryPostAsync(ByVal url As String, ByVal requestHeaders As Dictionary(Of String, String), ByVal postContent As String, tryTime As Integer) As Task(Of HttpResponse)
             Dim httpResponse As HttpResponse
 
@@ -1028,7 +1028,7 @@ Namespace ShanXingTech.Net2
         ''' <param name="requestHeaders">请求头集合。类库内部默认的 ContentType 头值为 <see cref="DefaulMediaType"/> 。若请求头不区分大小写，请使用带有 <see cref="IEqualityComparer(Of T)"/> 的重载来实例化集合。</param>
         ''' <param name="postContent">请求主体，不需要编码，直接原字符串传入。如果传入有包含编码的数据，可能会导致乱码或者数据丢失</param>
         ''' <param name="postContentEncoding">请求主体的编码方式，必须跟抓包的一致，否则可能会导致乱码</param>
-        ''' <returns></returns>
+        ''' <returns>注：如果同样的包，其他工具返回结果正常，本工具返回异常，请检查编码以及cookie的域</returns>
         Public Async Function TryPostThreeTimeIfErrorAsync(ByVal url As String, ByVal requestHeaders As Dictionary(Of String, String), ByVal postContent As String, ByVal postContentEncoding As Text.Encoding) As Task(Of HttpResponse)
             Return Await TryPostAsync(url, requestHeaders, postContent, postContentEncoding, 3)
         End Function
@@ -1039,7 +1039,7 @@ Namespace ShanXingTech.Net2
         ''' <param name="url"></param>
         ''' <param name="requestHeaders">请求头集合。类库内部默认的 ContentType 头值为 <see cref="DefaulMediaType"/> 。若请求头不区分大小写，请使用带有 <see cref="IEqualityComparer(Of T)"/> 的重载来实例化集合。</param>
         ''' <param name="postContent">请求主体，不需要编码，直接原字符串传入；内部默认使用UTF-8编码，如果抓包得到的不是UTF-8编码，请调用可以自定义编码方式的重载函数</param>
-        ''' <returns></returns>
+        ''' <returns>注：如果同样的包，其他工具返回结果正常，本工具返回异常，请检查编码以及cookie的域</returns>
         Public Async Function TryPostThreeTimeIfErrorAsync(ByVal url As String, ByVal requestHeaders As Dictionary(Of String, String), ByVal postContent As String) As Task(Of HttpResponse)
             Return Await TryPostAsync(url, requestHeaders, postContent, 3)
         End Function
