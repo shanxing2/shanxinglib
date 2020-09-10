@@ -256,7 +256,7 @@ Namespace ShanXingTech
                 Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(cookies)))
             End If
 
-            Dim sb = StringBuilderCache.Acquire(360)
+            Dim sb = New StringBuilder(360)
             Dim cookiesName As New List(Of String)
 
             For Each c In cookies.GetEnumerator

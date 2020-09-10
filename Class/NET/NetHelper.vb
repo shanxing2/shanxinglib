@@ -148,12 +148,12 @@ Namespace ShanXingTech.Net2
                 End If
 
                 ' 然后根据取得的数据大小初始化缓存，以及再次传入刚才返回的size
-                Dim sb = StringBuilderCache.AcquireSuper(size + 1)
+                Dim sb = New StringBuilder(size + 1)
                 If Not InternetGetCookieEx(url, vbNullString, sb, size, InternetCookieHttpOnly, IntPtr.Zero) Then
                     Return String.Empty
                 End If
 
-                funcRst = StringBuilderCache.GetStringAndReleaseBuilderSuper(sb)
+                funcRst = sb.ToString
             End If
 
             'Dim lastErrorCode = Marshal.GetLastWin32Error '<-- 259

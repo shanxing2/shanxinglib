@@ -324,7 +324,7 @@ Namespace ShanXingTech
                 .StartInfo = procStartInfo
             }
 
-            Dim sb = StringBuilderCache.Acquire(360)
+            Dim sb = New System.Text.StringBuilder(360)
             Dim readToEnd As Boolean
 
             Try
@@ -347,7 +347,7 @@ Namespace ShanXingTech
             End Try
 
             'Dim result = proc.StandardOutput.ReadToEnd().Replace("UUID", String.Empty).Trim
-            Dim result = If(sb.Length = 0, String.Empty, StringBuilderCache.GetStringAndReleaseBuilder(sb))
+            Dim result = If(sb.Length = 0, String.Empty, sb.ToString)
 
             Return result
         End Function
@@ -359,13 +359,13 @@ Namespace ShanXingTech
         ''' <returns></returns>
         Public Shared Function GetInputBoxEditHandle(ByVal inputBoxHandle As IntPtr) As IntPtr
             ' "WindowsForms10.EDIT.app.0.141b42a_r8_ad1",
-            Dim sbClassName = StringBuilderCache.Acquire(256)
+            Dim sbClassName = New System.Text.StringBuilder(256)
             Dim childHandle = Win32API.GetWindow(inputBoxHandle, Win32API.WindowType.GW_CHILD)
 
             Do While childHandle <> IntPtr.Zero
                 Win32API.GetClassName(childHandle, sbClassName, sbClassName.Capacity)
 
-                If StringBuilderCache.GetStringAndReleaseBuilder(sbClassName).IsMatch("WindowsForms\d+\.EDIT\.app\.0\.[a-z0-9_]+") Then
+                If sbClassName.ToString.IsMatch("WindowsForms\d+\.EDIT\.app\.0\.[a-z0-9_]+") Then
                     Return childHandle
                 End If
 

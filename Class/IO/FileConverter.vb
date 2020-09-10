@@ -373,7 +373,7 @@ Namespace ShanXingTech.IO2
                 excelFileFullPath = rst.FileName
 
                 ' 从dgv 获取整表数据到缓存sb
-                Dim sb = StringBuilderCache.Acquire(100 * dgv.RowCount)
+                Dim sb = New StringBuilder(100 * dgv.RowCount)
                 For Each row As DataGridViewRow In dgv.Rows
                     For colIndex As Integer = 0 To dgv.ColumnCount - 1
                         sb.Append(row.Cells.Item(colIndex).FormattedValue).Append("@@")
@@ -406,7 +406,7 @@ Namespace ShanXingTech.IO2
                 excelFileFullPath = rst.FileName
 
                 ' 从dgv 获取整表数据到缓存sb
-                Dim sb = StringBuilderCache.Acquire(100 * dgv.RowCount)
+                Dim sb = New StringBuilder(100 * dgv.RowCount)
                 For Each row As DataGridViewRow In dgv.Rows
                     For colIndex As Integer = 0 To dgv.ColumnCount - 1
                         sb.Append(row.Cells.Item(colIndex).FormattedValue).Append("@@")

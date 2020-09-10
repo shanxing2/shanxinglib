@@ -65,7 +65,7 @@ Namespace ShanXingTech.IO2
 				Throw New DirectoryNotFoundException("缓存路径不存在,数据无法正常导出！  文件名:" & path)
 			End If
 
-			Dim value = StringBuilderCache.GetStringAndReleaseBuilder(sb)
+			Dim value = sb.ToString
 			WriteText(path, value, access, CodePage.UTF8)
 		End Sub
 

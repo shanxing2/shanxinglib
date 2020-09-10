@@ -119,7 +119,7 @@ Namespace ShanXingTech
             If sourceString.IsNullOrEmpty Then Return String.Empty
 
             Dim byteLength = If(containDoubleByte, 4, 2)
-            Dim sb = StringBuilderCache.AcquireSuper(sourceString.Length \ byteLength)
+            Dim sb = New StringBuilder(sourceString.Length \ byteLength)
 
             Try
                 For i = 0 To (sourceString.Length - byteLength) Step byteLength
@@ -133,7 +133,7 @@ Namespace ShanXingTech
                 Logger.WriteLine(ex)
             End Try
 
-            Return StringBuilderCache.GetStringAndReleaseBuilderSuper(sb)
+            Return sb.ToString
         End Function
 
         ''' <summary>
@@ -335,9 +335,8 @@ Namespace ShanXingTech
         <Extension()>
         Public Function ToHexString(ByVal sourceByte() As Byte, ByVal upperLowerCase As UpperLowerCase) As String
             Dim i As Integer
-            Dim sb = If(sourceByte.Length > 180,
-                StringBuilderCache.AcquireSuper(sourceByte.Length * 2),
-                StringBuilderCache.Acquire(sourceByte.Length * 2))
+            Dim sb = New StringBuilder(sourceByte.Length * 2)
+
             Dim fotmat As String = "x2"
             If upperLowerCase = UpperLowerCase.Upper Then
                 fotmat = "X2"
@@ -348,9 +347,7 @@ Namespace ShanXingTech
                 i += 1
             End While
 
-            Return If(sourceByte.Length > 180,
-                StringBuilderCache.GetStringAndReleaseBuilderSuper(sb),
-                StringBuilderCache.GetStringAndReleaseBuilder(sb))
+            Return sb.ToString
         End Function
 
         ''' <summary>
@@ -437,7 +434,7 @@ Namespace ShanXingTech
             Next
 
             ' 然后判断数组的长度，如果大于1，那就是enumItems中不包含枚举值None项和All项（通常None定义为0,一般会与All同时被定义到枚举项中）
-            Dim sb = StringBuilderCache.Acquire(100)
+            Dim sb = New StringBuilder(100)
             Dim splitString = ", "
             If itemCount > 0 Then
                 For i = 0 To itemCount - 1
@@ -467,7 +464,7 @@ Namespace ShanXingTech
                 sb.Remove(sb.Length - splitString.Length, splitString.Length)
             End If
 
-            Return StringBuilderCache.GetStringAndReleaseBuilder(sb)
+            Return sb.ToString
         End Function
 
         ''' <summary>
@@ -1038,11 +1035,11 @@ Namespace ShanXingTech
             If Not isValue Then
                 Dim lastItem = KeyValuePairs.Last
                 sbKey.Insert(0, "&"c).Insert(0, lastItem.Value)
-                Dim value = StringBuilderCache.GetStringAndReleaseBuilder(sbKey)
+                Dim value = sbKey.ToString
                 KeyValuePairs(lastItem.Key) = value
             Else
-                Dim key = StringBuilderCache.GetStringAndReleaseBuilder(sbKey)
-                Dim value = StringBuilderCache.GetStringAndReleaseBuilder(sbValue)
+                Dim key = sbKey.ToString
+                Dim value = sbValue.ToString
                 KeyValuePairs.Add(key, value)
             End If
             sbKey.Length = 0

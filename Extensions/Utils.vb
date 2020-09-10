@@ -19,8 +19,7 @@ Namespace ShanXingTech
                     End If
 
                     While Not bc.IsAddingCompleted OrElse
-                        Not bc.IsCompleted OrElse
-                         Not loopTask.IsCompleted
+                          Not loopTask.IsCompleted
                         Windows2.Delay(100)
                     End While
                     loopTask.Dispose()

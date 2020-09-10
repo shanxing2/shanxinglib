@@ -172,12 +172,12 @@ Namespace ShanXingTech.IO2
             ' 显示短路径
             If fullPath.Length > 0 Then
                 ' sb的初始capacity必须2倍的字符串长度
-                Dim sb As Text.StringBuilder = StringBuilderCache.Acquire(fullPath.Length * 2)
+                Dim sb = New Text.StringBuilder(fullPath.Length * 2)
                 Dim shortPathLen As Integer = UnsafeNativeMethods.GetShortPathName(fullPath, sb, sb.Capacity)
 
                 If shortPathLen > 0 Then
                     sb.Remove(shortPathLen, sb.Length - shortPathLen)
-                    funcRst = StringBuilderCache.GetStringAndReleaseBuilder(sb)
+                    funcRst = sb.ToString
                 End If
             End If
 

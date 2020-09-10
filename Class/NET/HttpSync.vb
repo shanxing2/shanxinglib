@@ -426,7 +426,7 @@ Namespace ShanXingTech.Net2
 					' vs的代码分析 和clr via C# 都有提到介个问题
 					stream = New GZipStream(stream, CompressionMode.Decompress)
 				End If
-				responseContent = StringBuilderCache.GetStringAndReleaseBuilderSuper(stream.ReadToEndExt(encoding))
+				responseContent = stream.ReadToEndExt(encoding).ToString
 
 				' 获取cookie
 				cookies?.Add(response.Cookies)
@@ -492,7 +492,7 @@ Namespace ShanXingTech.Net2
 					Text.Encoding.GetEncoding(encodingName),
 					Text.Encoding.UTF8)
 
-				responseContent = StringBuilderCache.GetStringAndReleaseBuilderSuper(stream.ReadToEndExt(encoding))
+				responseContent = stream.ReadToEndExt(encoding).ToString
 
 				' 获取cookie
 				cookies?.Add(response.Cookies)

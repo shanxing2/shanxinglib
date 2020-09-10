@@ -5,6 +5,7 @@ Imports System.Net.Http.Handlers
 Imports System.Net.Http.Headers
 Imports System.Net.Security
 Imports System.Security.Cryptography.X509Certificates
+Imports System.Text
 Imports System.Threading
 Imports System.Threading.Tasks
 
@@ -520,7 +521,7 @@ Namespace ShanXingTech.Net2
         ''' <param name="postContentEncoding"></param>
         ''' <returns></returns>
         Private Function EncodeContent(ByVal postContentKvp As IEnumerable(Of KeyValuePair(Of String, String)), ByVal postContentEncoding As Text.Encoding) As String
-            Dim sb = StringBuilderCache.AcquireSuper(361)
+            Dim sb = New StringBuilder(361)
             For Each kvp As KeyValuePair(Of String, String) In postContentKvp
                 If sb.Length > 0 Then
                     sb.Append("&"c)
@@ -529,7 +530,7 @@ Namespace ShanXingTech.Net2
                 sb.Append("="c)
                 sb.Append(kvp.Value.UrlEncode(postContentEncoding))
             Next
-            Dim postContent = StringBuilderCache.GetStringAndReleaseBuilderSuper(sb)
+            Dim postContent = sb.ToString
             Return postContent
         End Function
 

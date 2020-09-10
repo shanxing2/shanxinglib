@@ -51,6 +51,7 @@ Namespace ShanXingTech.Text2
     ''' <para>英文原文链接：http://download-codeplex.sec.s-msft.com/Download?ProjectName=roslyn&amp;DownloadId=838017Essential </para>
     ''' <para>译文链接：http://www.cnblogs.com/yangecnu/p/Essential-DotNet-Framework-Performance-Truths-and-Tips.html </para>
     ''' <para>另外在MSDN “编写大型的响应式 .NET Framework 应用” 一文中也可以看到</para>
+    ''' <para>注：本类非线程安全</para>
     ''' </summary>
     Public Class StringBuilderCache
         ' 明文：神即道, 道法自然, 如来|闪星网络信息科技 ShanXingTech Q2287190283

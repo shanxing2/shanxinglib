@@ -680,6 +680,56 @@ Namespace ShanXingTech
         ''' <param name="dgv"></param>
         ''' <param name="showLastColumn">是否显示最后一列</param>
         ''' <param name="autoSizeColumnsMode">设置列宽自动调整模式</param>
+        ''' <returns></returns>
+        <Extension()>
+        Public Function AdjustDgv(Of T As DataGridView)(ByRef dgv As T， ByVal showLastColumn As Boolean, ByVal autoSizeColumnsMode As DataGridViewAutoSizeColumnsMode, Optional ByVal sortMode As DataGridViewColumnSortMode = DataGridViewColumnSortMode.NotSortable) As Boolean
+            Try
+                ' 如果已经调整过 就不需要再次调整
+                If dgv.ReadOnly Then
+                    Return True
+                End If
+
+                With dgv
+                    .SuspendLayout()
+
+                    For Each col As DataGridViewColumn In .Columns
+                        col.SortMode = sortMode
+                    Next col
+
+                    ' 是否隐藏最后一列
+                    dgv.Columns.Item(dgv.Columns.Count - 1).Visible = showLastColumn
+
+                    ' 标题剧中对齐
+                    .ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+                    .AutoSizeColumnsMode = autoSizeColumnsMode
+                    ' 标题不换行
+                    .ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.False
+
+                    .AllowDrop = False
+                    .AllowUserToAddRows = False
+                    .AllowUserToDeleteRows = False
+                    .ReadOnly = True
+
+                    .ResumeLayout()
+                End With
+
+                Return True
+            Catch ex As Exception
+                Logger.WriteLine(ex)
+
+                Return False
+            End Try
+        End Function
+
+        ''' <summary>
+        ''' 调整DataGridView控件 
+        ''' 1.添加列标题 
+        ''' 2.标题居中 
+        ''' 4.不允许用户手动编辑 及新增删除行 只读
+        ''' </summary>
+        ''' <param name="dgv"></param>
+        ''' <param name="showLastColumn">是否显示最后一列</param>
+        ''' <param name="autoSizeColumnsMode">设置列宽自动调整模式</param>
         ''' <param name="appendColumn">要动态添加的列</param> 
         ''' <returns></returns>
         <Extension()>
@@ -925,6 +975,30 @@ Namespace ShanXingTech
             End If
         End Sub
 
+        ''' <summary>
+        ''' 以 列头 排序，并显示小三角。注：需要排序的列的 <see cref="DataGridViewColumn.SortMode"/> 不能为 <see cref="DataGridViewColumnSortMode.NotSortable"/>
+        ''' </summary>
+        ''' <typeparam name="T"></typeparam>
+        ''' <param name="dgv"><see cref="DataGridView"/>实例</param>
+        ''' <param name="columnIndex">需要排序的列</param>
+        ''' <param name="dataSource">需要排序的数据源</param>
+        <Extension()>
+        Public Sub TrySortByColumnHeader(Of T)(ByRef dgv As DataGridView, ByVal columnIndex As Integer, ByVal dataSource As IList(Of T))
+            Try
+                ' 循环使用排序
+                Dim colName = dgv.Columns(columnIndex).Name
+                If dgv.Columns(columnIndex).HeaderCell.SortGlyphDirection = SortOrder.Ascending Then
+                    dgv.DataSource = dataSource.AsQueryable.OrderByDescending(dgv.Columns(columnIndex).Name).ToArray
+                    ' 不能使用index，上面排序后，index会变
+                    dgv.Columns(colName).HeaderCell.SortGlyphDirection = SortOrder.Descending
+                Else
+                    dgv.DataSource = dataSource.AsQueryable.OrderBy(dgv.Columns(columnIndex).Name).ToArray
+                    dgv.Columns(colName).HeaderCell.SortGlyphDirection = SortOrder.Ascending
+                End If
+            Catch ex As Exception
+                Logger.WriteLine(ex)
+            End Try
+        End Sub
 #End Region
 
     End Module

@@ -261,7 +261,7 @@ Namespace ShanXingTech
 
             Dim lastpos As Integer
             Dim i As Integer
-            Dim sb = StringBuilderCache.AcquireSuper(sourceString.Length)
+            Dim sb = New StringBuilder(sourceString.Length)
             While i < sourceString.Length
                 If sourceString(i) = ControlChars.Cr OrElse sourceString(i) = ControlChars.Lf Then
                     ' 找到第一个 cr 或者是 lf的位置,然后把前面的字符加到sb
@@ -294,9 +294,9 @@ Namespace ShanXingTech
 
             ' 可能源字符串没有包含换行符,因此里面没有任何数据，直接返回源字符串就好
             If sb.Length = 0 Then
-                StringBuilderCache.GetStringAndReleaseBuilderSuper(sb)
+                sb.ToString()
             Else
-                sourceString = StringBuilderCache.GetStringAndReleaseBuilderSuper(sb)
+                sourceString = sb.ToString
             End If
 
             Return sourceString
@@ -345,9 +345,9 @@ Namespace ShanXingTech
 				fotmat += "2"
 			End If
 
-			Dim sb = StringBuilderCache.AcquireSuper(sourceString.Length * subStringLength)
+            Dim sb = New StringBuilder(sourceString.Length * subStringLength)
 
-			Dim i As Integer
+            Dim i As Integer
 			Dim needSeparator = Not String.IsNullOrEmpty(separator)
 			While i < sourceString.Length
 				If needSeparator Then
@@ -357,8 +357,8 @@ Namespace ShanXingTech
 				i += 1
 			End While
 
-			Return StringBuilderCache.GetStringAndReleaseBuilderSuper(sb)
-		End Function
+            Return sb.ToString
+        End Function
 
 		''' <summary>
 		''' 判断是否包含汉字字符串
@@ -398,7 +398,7 @@ Namespace ShanXingTech
                 Return Web.HttpUtility.UrlEncode(sourceString, encoding)
             Else
                 Dim funcRst = Web.HttpUtility.UrlEncode(sourceString, encoding)
-                Dim sb = StringBuilderCache.Acquire(sourceString.Length * 3)
+                Dim sb = New StringBuilder(sourceString.Length * 3)
                 For Each c In sourceString
                     Dim ue = Web.HttpUtility.UrlEncode(c, encoding)
                     If c = ue Then
@@ -408,7 +408,7 @@ Namespace ShanXingTech
                     End If
                 Next
 
-                Return StringBuilderCache.GetStringAndReleaseBuilder(sb)
+                Return sb.ToString
             End If
         End Function
 
@@ -587,7 +587,6 @@ Namespace ShanXingTech
             Return -1
         End Function
 
-
         ''' <summary>
         ''' 从 <paramref name="sb"/> 的 <paramref name="startIndex"/> 位置开始或者 <paramref name="length"/> 长度字符串
         ''' </summary>
@@ -601,17 +600,13 @@ Namespace ShanXingTech
             If sb.Length = 0 Then Return funcRst
             If length = 1 Then Return sb.Chars(startIndex)
 
-            Dim tempSb = If(length > StringBuilderCache.MAX_BUILDER_SIZE,
-                StringBuilderCache.Acquire(length),
-                StringBuilderCache.AcquireSuper(length))
+            Dim tempSb = New StringBuilder(length)
 
             For charIndex = startIndex To startIndex + length - 1
                 tempSb.Append(sb.Chars(charIndex))
             Next
 
-            Return If(length > StringBuilderCache.MAX_BUILDER_SIZE,
-                StringBuilderCache.GetStringAndReleaseBuilder(tempSb),
-                StringBuilderCache.GetStringAndReleaseBuilderSuper(tempSb))
+            Return tempSb.ToString
         End Function
 
 
@@ -671,9 +666,7 @@ Namespace ShanXingTech
         Public Function TryRemoveInvalidFileNameChar(ByRef fileName As String) As Boolean
             If fileName Is Nothing OrElse fileName.Length = 0 Then Return False
 
-            Dim sb = If(fileName.Length < 361,
-                StringBuilderCache.Acquire(fileName.Length),
-                StringBuilderCache.AcquireSuper(fileName.Length))
+            Dim sb = New StringBuilder(fileName.Length)
             Dim invalidFileNameChars = IO.Path.GetInvalidFileNameChars
             For i = 0 To fileName.Length - 1
                 If invalidFileNameChars.AsParallel.Contains(fileName(i)) Then
@@ -681,9 +674,7 @@ Namespace ShanXingTech
                 End If
                 sb.Append(fileName(i))
             Next
-            fileName = If(fileName.Length < 361,
-                StringBuilderCache.GetStringAndReleaseBuilder(sb),
-                StringBuilderCache.GetStringAndReleaseBuilderSuper(sb))
+            fileName = sb.ToString
 
             Return True
         End Function
@@ -707,7 +698,7 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function ReadToEndExt(ByVal stream As Stream, ByVal encoding As System.Text.Encoding) As StringBuilder
-            Dim funcRst As StringBuilder = StringBuilderCache.AcquireSuper(BufferSize)
+            Dim funcRst = New StringBuilder(BufferSize)
             If Not stream.CanRead Then Return funcRst
 
             ' StreamReader实例的Read方法默认的缓存大小为4K=4096字节
@@ -744,7 +735,7 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Async Function ReadToEndExtAsync(ByVal stream As Stream, ByVal encoding As System.Text.Encoding) As Task(Of StringBuilder)
-            Dim funcRst As StringBuilder = StringBuilderCache.AcquireSuper(BufferSize)
+            Dim funcRst = New StringBuilder(BufferSize)
             If Not stream.CanRead Then Return funcRst
 
             ' StreamReader实例的Read方法默认的缓存大小为4K=4096字节
@@ -861,7 +852,7 @@ Namespace ShanXingTech
             Dim valueIndex As Integer = -1
             Dim nextKeyIndex As Integer = -1
 
-            Dim sb = StringBuilderCache.Acquire(urlLength)
+            Dim sb = New StringBuilder(urlLength)
             While i < urlLength
                 If IsCharEqual(key, url(i), True) AndAlso
                     "="c = url(i + 1) AndAlso
@@ -883,7 +874,7 @@ Namespace ShanXingTech
                 i += 1
             End While
 
-            Dim keyword = StringBuilderCache.GetStringAndReleaseBuilder(sb)
+            Dim keyword = sb.ToString
             Return keyword
         End Function
 
@@ -908,7 +899,7 @@ Namespace ShanXingTech
             Dim valueIndex As Integer = -1
             Dim nextKeyIndex As Integer = -1
             ' "(\w+)=([\w+|-|/|+|=]*)"
-            Dim sb = StringBuilderCache.Acquire(urlLength)
+            Dim sb = New StringBuilder(urlLength)
             While i < urlLength
                 ' 是 key的第一个字符，并且往后都一样，并且前面一个字符是&或者？
                 If IsCharEqual(key(0), url(i), True) AndAlso
@@ -934,7 +925,7 @@ Namespace ShanXingTech
 
             If sb.Length = 0 Then Return String.Empty
 
-            Dim keyword = StringBuilderCache.GetStringAndReleaseBuilder(sb)
+            Dim keyword = sb.ToString
             Return keyword
         End Function
 
@@ -1037,7 +1028,7 @@ Namespace ShanXingTech
         Public Function TryEscapeLikeWildcards(ByVal valueWithWildcards As String) As String
             If valueWithWildcards.IsNullOrEmpty Then Return String.Empty
 
-            Dim sb = StringBuilderCache.Acquire(360)
+            Dim sb = New StringBuilder(360)
 
             Dim i As Integer
             While i < valueWithWildcards.Length
@@ -1052,7 +1043,7 @@ Namespace ShanXingTech
                 i += 1
             End While
 
-            Return StringBuilderCache.GetStringAndReleaseBuilder(sb)
+            Return sb.ToString
         End Function
     End Module
 End Namespace
