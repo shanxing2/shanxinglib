@@ -18,6 +18,7 @@ Namespace ShanXingTech
                         bc.CompleteAdding()
                     End If
 
+                    ' 任意一个条件未满足都继续等待
                     While Not bc.IsAddingCompleted OrElse
                           Not loopTask.IsCompleted
                         Windows2.Delay(100)

@@ -457,7 +457,7 @@ Namespace ShanXingTech
         ''' <param name="browser"></param>
         ''' <param name="behavior"></param>
         <Extension()>
-        Public Sub SuppressWininetBehavior(ByRef browser As WebBrowser， ByVal behavior As Integer)
+        Public Function SuppressWininetBehavior(ByRef browser As WebBrowser， ByVal behavior As Integer) As Boolean
 
             ' SOURCE: http://msdn.microsoft.com/en-us/library/windows/desktop/aa385328%28v=vs.85%29.aspx
             '    * INTERNET_OPTION_SUPPRESS_BEHAVIOR (81):
@@ -472,13 +472,71 @@ Namespace ShanXingTech
 
             ' 禁止Cookie保留，也就是每个窗口具有独立Cookie
             Dim lpBuffer = New IntPtr(behavior)
-            Dim success As Boolean = InternetSetOption(IntPtr.Zero, INTERNET_OPTION_SUPPRESS_BEHAVIOR, lpBuffer, Marshal.SizeOf(behavior.GetType))
+            Dim success = InternetSetOption(IntPtr.Zero, INTERNET_OPTION_SUPPRESS_BEHAVIOR, lpBuffer, Marshal.SizeOf(behavior.GetType))
             IntPtrFree(lpBuffer)
 
-            If Not success Then
-                Logger.WriteLine("失败")
+            Return success
+        End Function
+
+        ''' <summary>
+        ''' <see cref="WebBrowser"/> 执行JavaScript并返回结果
+        ''' </summary>
+        ''' <param name="webBrowser"></param>
+        ''' <param name="js">完整的js函数实现</param>
+        ''' <param name="jsFuncName"><paramref name="js"/> 中函数的名称</param>
+        ''' <returns></returns>
+        <Extension()>
+        Public Function RunJs(ByRef webBrowser As WebBrowser, ByVal js As String, ByVal jsFuncName As String) As Object
+            If webBrowser?.Document Is Nothing Then Return Nothing
+
+            If js.IsNullOrEmpty Then
+                Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(js)))
             End If
-        End Sub
+
+            If jsFuncName.IsNullOrEmpty Then
+                Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(jsFuncName)))
+            End If
+
+            Dim script = webBrowser.Document.CreateElement("script")
+            If script Is Nothing Then Return Nothing
+
+            script.SetAttribute("type", "text/javascript")
+            script.SetAttribute("id", jsFuncName)
+            script.SetAttribute("text", js)
+
+            ' 函数名做id,不重复添加
+            Dim existsChildren As Boolean
+            For Each element2 As HtmlElement In webBrowser.Document.Body.Children.AsParallel
+                If jsFuncName = element2.Id Then
+                    existsChildren = True
+                    Exit For
+                End If
+            Next
+
+            If Not existsChildren Then
+                Dim element = webBrowser.Document.Body.AppendChild(script)
+                If element Is Nothing Then Return Nothing
+            End If
+
+            Return webBrowser.Document.InvokeScript(jsFuncName)
+        End Function
+
+        ''' <summary>
+        ''' <see cref="WebBrowser"/> 执行JavaScript并返回结果
+        ''' </summary>
+        ''' <param name="webBrowser"></param>
+        ''' <param name="jsFuncName">Html页面中JS函数的名称，如果此函数不在Html页面中，请使用 <seealso cref="RunJs(ByRef WebBrowser, String, String)"/> </param>
+        ''' <returns></returns>
+        <Extension()>
+        Public Function RunJs(ByRef webBrowser As WebBrowser, ByVal jsFuncName As String) As Object
+            If webBrowser?.Document Is Nothing Then Return Nothing
+
+            If jsFuncName.IsNullOrEmpty Then
+                Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(jsFuncName)))
+            End If
+
+            Return webBrowser.Document.InvokeScript(jsFuncName)
+        End Function
 
         ''' <summary>
         ''' 设置请求头

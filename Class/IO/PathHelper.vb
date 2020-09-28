@@ -261,16 +261,16 @@ Namespace ShanXingTech.IO2
         ''' 获取文件要存放的文件夹路径（由用户选择）
         ''' </summary>
         ''' <param name="textBox">要输出的textbox控件名称，输出短路径</param>
-        ''' <param name="folder">返回选择的文件夹路径</param>
+        ''' <param name="outFolder">返回选择的文件夹路径</param>
         ''' <param name="dlgTips">需要显示的提示</param>
         ''' <returns>成功返回true，其余返回false</returns>
-        Public Shared Function SetFileSaveShortPath(textBox As TextBox， ByRef folder As String， ByVal dlgTips As String) As Boolean
+        Public Shared Function SetFileSaveShortPath(textBox As TextBox， ByRef outFolder As String， ByVal dlgTips As String) As Boolean
             Dim setRst = SetFileSavePath(textBox, dlgTips)
             ' 如果获取成功，那就返回段路径
             If setRst.Success Then
                 textBox.Text = GetShortPath(setRst.FolderName)
             End If
-            folder = setRst.FolderName
+            outFolder = setRst.FolderName
 
             Return setRst.Success
         End Function
@@ -306,11 +306,11 @@ Namespace ShanXingTech.IO2
         ''' 获取文件存储的文件夹路径（由用户选择）
         ''' </summary>
         ''' <param name="textBox">要输出的textbox控件名称，输出路径</param>
-        ''' <param name="folder">返回选择的文件夹路径</param>
+        ''' <param name="outFolder">返回选择的文件夹路径</param>
         ''' <returns>成功返回true，其余返回false</returns>
-        Public Shared Function GetFileStorePath(textBox As TextBox， ByRef folder As String， ByVal dlgTips As String) As Boolean
+        Public Shared Function GetFileStorePath(textBox As TextBox， ByRef outFolder As String， ByVal dlgTips As String) As Boolean
             Dim setRst = GetFileStorePath(textBox, dlgTips)
-            folder = setRst.FolderName
+            outFolder = setRst.FolderName
 
             Return setRst.Success
         End Function

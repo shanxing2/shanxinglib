@@ -31,10 +31,15 @@ Namespace ShanXingTech.IO2
         <Description("CSV (逗号分隔)文件(*.csv)|*.csv")>
         CSV = 4
         ''' <summary>
+        ''' Access 数据库(*.mdb;*.mde;*.accdb;*.accde)|*.mdb;*.mde;*.accdb;*.accde
+        ''' </summary>
+        <Description("Access 数据库(*.mdb;*.mde;*.accdb;*.accde)|*.mdb;*.mde;*.accdb;*.accde")>
+        Access = 8
+        ''' <summary>
         ''' 所有文件(*.*)|*.*
         ''' </summary>
         <Description("所有文件(*.*)|*.*")>
-        All = EXCEL Or TXT Or CSV
+        All = EXCEL Or TXT Or CSV Or Access
     End Enum
 
 End Namespace
