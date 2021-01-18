@@ -11,7 +11,7 @@ Namespace ShanXingTech.Net2
 		''' </summary>
 		Private Class GBKCompatibleHanlder
 			Inherits HttpClientHandler
-#Region "字段区"
+#Region "属性区"
 			Private ReadOnly m_CharSet As String
 #End Region
 

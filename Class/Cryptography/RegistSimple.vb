@@ -15,6 +15,11 @@ Namespace ShanXingTech.Cryptography
             Dim registrationCode As String = String.Empty
 
             ' 初始化注册信息保存路径
+            s_RegistInfoFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)
+            If Not "\"c = s_RegistInfoFolder.Chars(s_RegistInfoFolder.Length - 1) Then
+                s_RegistInfoFolder += "\"
+            End If
+            s_RegistInfoFolder += My.Application.Info.CompanyName & "\"
 
             ' 先获取主板UUID
             Dim uuid = Windows2.CmdRun("wmic csproduct get UUID")
@@ -39,25 +44,12 @@ Namespace ShanXingTech.Cryptography
             ' uuid后再添加 计算机名
             guidId &= "_" & Environment.MachineName.GetHashCode
 
-            s_RegistInfoFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)
-            If Not "\"c = s_RegistInfoFolder.Chars(s_RegistInfoFolder.Length - 1) Then
-                s_RegistInfoFolder += "\"
-            End If
-            ' 为了兼容旧版本，需要添加以下代码，把之前的注册文件移动到新位置
-            Dim oldRegistInfoFileName = $"{s_RegistInfoFolder}{guidId}-{appName}.dat"
-
-            s_RegistInfoFolder += My.Application.Info.CompanyName & "\"
             s_RegistInfoFileName = $"{s_RegistInfoFolder}{guidId}-{appName}.dat"
 
             ' 如果本地没有相关注册信息 那就生成一个注册码保存到本地
             If Not Directory.Exists(s_RegistInfoFolder) Then
                 ' 创建保存目录
                 IO2.Directory.Create(s_RegistInfoFolder)
-            End If
-
-            ' 如果有旧的注册信息，则移动到新文件夹内
-            If File.Exists(oldRegistInfoFileName) Then
-                Directory.Move(oldRegistInfoFileName, s_RegistInfoFileName)
             End If
 
             If File.Exists(s_RegistInfoFileName) Then
@@ -73,7 +65,10 @@ Namespace ShanXingTech.Cryptography
                 Return (machineCode, registrationCode)
             Else
                 ' 没有注册信息则生成全球唯一注册码并保存
-                machineCode = If(guidId.IsNullOrEmpty, Guid.NewGuid.ToString(), guidId)
+                ' 升级旧版文件名 guidId-Environment.MachineName.GetHashCode-软件名.dat 为 (guidId-Environment.MachineName.GetHashCode-软件名).GetMD5Value-软件名.dat
+                machineCode = If(guidId.IsNullOrEmpty,
+                    $"{Guid.NewGuid.ToString()}-{appName}",
+                    $"{guidId}-{appName}").GetMD5Value
 
                 WriteRegistInfoToFile(machineCode, registrationCode)
 
@@ -92,7 +87,6 @@ Namespace ShanXingTech.Cryptography
                 Using stream As New StreamWriter(s_RegistInfoFileName, False, System.Text.Encoding.UTF8)
                     stream.Write($"{machineCode}={registrationCode}")
                 End Using
-                Debug.Print(Logger.MakeDebugString("注册信息保存完成"))
             Catch ex As Exception
                 Logger.WriteLine(ex)
             End Try

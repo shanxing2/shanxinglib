@@ -58,9 +58,10 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function ToTimeStampTime(ByVal timeStampValue As Long, ByVal timePrecision As TimePrecision) As Date
-            If timeStampValue < 0 Then Throw New TimeStampException(String.Format(My.Resources.ArgumentOutOfRange, NameOf(timeStampValue), "(0,Long.MaxValue]"))
+            ' -62135596800= (New Date).ToTimeStamp(TimePrecision.Second)
+            If timeStampValue < -62135596800 Then Throw New TimeStampException(String.Format(My.Resources.ArgumentOutOfRange, NameOf(timeStampValue), "(0,Long.MaxValue]"))
 
-            Dim dtStart = TimeZone.CurrentTimeZone.ToLocalTime(New DateTime(1970, 1, 1))
+            Dim dtStart = TimeZone.CurrentTimeZone.ToLocalTime(New DateTime(1970, 1, 1, 0, 0, 0))
             Dim precision = 10000L
             If timePrecision = TimePrecision.Second Then
                 precision = 10000000

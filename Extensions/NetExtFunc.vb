@@ -525,7 +525,8 @@ Namespace ShanXingTech
         ''' <see cref="WebBrowser"/> 执行JavaScript并返回结果
         ''' </summary>
         ''' <param name="webBrowser"></param>
-        ''' <param name="jsFuncName">Html页面中JS函数的名称，如果此函数不在Html页面中，请使用 <seealso cref="RunJs(ByRef WebBrowser, String, String)"/> </param>
+        ''' <param name="jsFuncName">Html页面中JS函数的名称，如果此函数不在Html页面中，请使用 <seealso cref="RunJs(ByRef WebBrowser, String, String)"/> 。
+        ''' <para>注：如果是全局函数或属性，使用 ‘window.函数名()’ 或 ‘‘window.属性名’’ 方式无效，此时可以尝试使用套娃方式，利用 <see cref="RunJs(ByRef WebBrowser, String, String)"/>间接调用。比如 RunJs("自定义函数名","function 自定义函数名(){return window.json_ua.toString()}")</para></param>
         ''' <returns></returns>
         <Extension()>
         Public Function RunJs(ByRef webBrowser As WebBrowser, ByVal jsFuncName As String) As Object

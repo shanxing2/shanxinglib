@@ -49,14 +49,13 @@ Namespace ShanXingTech.Net2
         ''' <returns></returns>
         Public Property DefaultCharSet As String
 
-        Private m_AllowAutoRedirect As Boolean
         ''' <summary>
         ''' 指示请求是否启用自动重定向
         ''' </summary>
         ''' <returns></returns>
         Public ReadOnly Property AllowAutoRedirect() As Boolean
             Get
-                Return m_AllowAutoRedirect
+                Return m_HttpClientHandler.AllowAutoRedirect
             End Get
         End Property
 
@@ -71,7 +70,8 @@ Namespace ShanXingTech.Net2
 
                 ' 如果已经实例化，需要同时更新 Timeout 字段以使设置生效
                 If m_HttpClient Is Nothing Then Return
-                ReInit(Cookies, m_AllowAutoRedirect, Proxy, DefaultCharSet)
+
+                ReInit(Cookies, AllowAutoRedirect, Proxy, DefaultCharSet)
             End Set
             Get
                 Return m_DefaulTimeoutMilliseconds
@@ -95,6 +95,17 @@ Namespace ShanXingTech.Net2
         Public ReadOnly Property UseProxy() As Boolean
             Get
                 Return m_HttpClientHandler.UseProxy
+            End Get
+        End Property
+
+        Private m_CharSet As String
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property CharSet() As String
+            Get
+                Return m_CharSet
             End Get
         End Property
 #End Region
@@ -148,7 +159,6 @@ Namespace ShanXingTech.Net2
         Sub New(ByVal allowAutoRedirect As Boolean)
             HttpPublicConfig()
 
-            m_AllowAutoRedirect = allowAutoRedirect
             InitInternal(Nothing, allowAutoRedirect, Nothing, Nothing)
         End Sub
 
@@ -170,7 +180,6 @@ Namespace ShanXingTech.Net2
         Sub New(ByRef cookies As CookieContainer, ByVal allowAutoRedirect As Boolean)
             HttpPublicConfig()
 
-            m_AllowAutoRedirect = allowAutoRedirect
             InitInternal(cookies, allowAutoRedirect, Nothing, Nothing)
         End Sub
 
@@ -183,7 +192,6 @@ Namespace ShanXingTech.Net2
         Sub New(ByRef cookies As CookieContainer, ByVal allowAutoRedirect As Boolean, ByRef proxy As IWebProxy)
             HttpPublicConfig()
 
-            m_AllowAutoRedirect = allowAutoRedirect
             InitInternal(cookies, allowAutoRedirect, proxy, Nothing)
         End Sub
 
@@ -197,7 +205,6 @@ Namespace ShanXingTech.Net2
         Sub New(ByRef cookies As CookieContainer, ByVal allowAutoRedirect As Boolean, ByRef proxy As IWebProxy, ByVal charSet As String)
             HttpPublicConfig()
 
-            m_AllowAutoRedirect = allowAutoRedirect
             InitInternal(cookies, allowAutoRedirect, proxy, charSet)
         End Sub
 #End Region
@@ -212,7 +219,8 @@ Namespace ShanXingTech.Net2
         ''' <param name="charSet">解码响应文本使用的字符集，设置错误会导致乱码。设置之前，确保访问的每个网页的字符集都是一样的，否则建议使用无参数的构造函数，程序内部自动检查字符集，当然也会牺牲一点效率。</param>
         Private Sub InitInternal(ByVal cookies As CookieContainer, ByVal allowAutoRedirect As Boolean, ByRef proxy As IWebProxy, ByVal charSet As String)
             DefaultCharSet = "GBK"
-            m_DefaulTimeoutMilliseconds = 10000
+            m_DefaulTimeoutMilliseconds = 30 * 1000
+            m_CharSet = charSet
 
             m_HttpClientHandler = New GBKCompatibleHanlder(charSet) With {
                 .UseProxy = proxy IsNot Nothing,
@@ -248,7 +256,6 @@ Namespace ShanXingTech.Net2
         ''' <param name="cookies">如果为Nothing，则只重新初始化类，不设置cookie</param>
         ''' <param name="allowAutoRedirect">指示处理程序是否应跟随重定向响应,默认为True</param>
         Public Sub ReInit(ByRef cookies As CookieContainer, ByVal allowAutoRedirect As Boolean)
-            m_AllowAutoRedirect = allowAutoRedirect
             InitInternal(cookies, allowAutoRedirect, Nothing, Nothing)
         End Sub
 
@@ -259,7 +266,6 @@ Namespace ShanXingTech.Net2
         ''' <param name="allowAutoRedirect">指示处理程序是否应跟随重定向响应,默认为True</param>
         ''' <param name="proxy">指示处理程序是否应设置代理信息,默认为Nothing</param>
         Public Sub ReInit(ByRef cookies As CookieContainer, ByVal allowAutoRedirect As Boolean, ByRef proxy As IWebProxy)
-            m_AllowAutoRedirect = allowAutoRedirect
             InitInternal(cookies, allowAutoRedirect, proxy, Nothing)
         End Sub
         ''' <summary>
@@ -270,8 +276,25 @@ Namespace ShanXingTech.Net2
         ''' <param name="proxy">指示处理程序是否应设置代理信息,默认为Nothing</param>
         ''' <param name="charSet">解码响应文本使用的字符集，设置错误会导致乱码。设置之前，确保访问的每个网页的字符集都是一样的，否则建议使用无参数的构造函数，程序内部自动检查字符集，当然也会牺牲一点效率。</param>
         Private Sub ReInit(ByRef cookies As CookieContainer, ByVal allowAutoRedirect As Boolean, ByRef proxy As IWebProxy, ByVal charSet As String)
-            m_AllowAutoRedirect = allowAutoRedirect
             InitInternal(cookies, allowAutoRedirect, proxy, charSet)
+        End Sub
+        ''' <summary>
+        ''' 设置代理
+        ''' </summary>
+        ''' <param name="enabled">是否启用代理</param>
+        ''' <param name="proxy">代理信息</param>
+        Public Sub SetProxy(ByVal enabled As Boolean, ByVal proxy As IWebProxy)
+            InitInternal(Cookies, AllowAutoRedirect, If(enabled, proxy, Nothing), m_CharSet)
+        End Sub
+
+        ''' <summary>
+        ''' 设置代理
+        ''' </summary>
+        ''' <param name="enabled">是否启用代理</param>
+        ''' <param name="host">代理主机的名称</param>
+        ''' <param name="port">要使用的 <paramref name="host"/> 上的端口号</param>
+        Public Sub SetProxy(ByVal enabled As Boolean, ByVal host As String, ByVal port As Integer)
+            InitInternal(Cookies, AllowAutoRedirect, If(enabled, New WebProxy(host, port), Nothing), m_CharSet)
         End Sub
 
         ''' <summary>

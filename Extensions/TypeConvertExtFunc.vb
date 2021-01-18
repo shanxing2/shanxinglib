@@ -76,7 +76,7 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 16进制字符串转换为直接数组。默认把<paramref name="hexString"/>当做全部由单字节字符组成的字符串来处理
+        ''' 16进制字符串转换为字节数组。默认把<paramref name="hexString"/>当做全部由单字节字符组成的字符串来处理
         ''' </summary>
         ''' <param name="hexString"></param>
         ''' <returns></returns>
