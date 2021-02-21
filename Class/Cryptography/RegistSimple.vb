@@ -22,7 +22,7 @@ Namespace ShanXingTech.Cryptography
             s_RegistInfoFolder += My.Application.Info.CompanyName & "\"
 
             ' 先获取主板UUID
-            Dim uuid = Windows2.CmdRun("wmic csproduct get UUID")
+            Dim uuid = Windows2.CmdRunOnlyReturnResult("wmic csproduct get UUID")
             ' 注，有些电脑会返回 ’03000200-0400-0500-0006-000700080009‘，这个可能是重复的，
             ' 没有uuid的全部是F
 
@@ -54,13 +54,15 @@ Namespace ShanXingTech.Cryptography
 
             If File.Exists(s_RegistInfoFileName) Then
                 ' 如果有 则读取
-                Dim fileContext = My.Computer.FileSystem.ReadAllText(s_RegistInfoFileName, System.Text.Encoding.UTF8)
-                If Not fileContext.IndexOf("=") > -1 Then
+                Dim fileContent = IO2.Reader.ReadFile(s_RegistInfoFileName, Text.Encoding.UTF8)
+                Dim fileContentSpan = fileContent.AsSpan
+                Dim equalPos = fileContentSpan.IndexOf("="c)
+                If Not equalPos > -1 Then
                     Return (machineCode, registrationCode)
                 End If
 
-                machineCode = fileContext.Substring(0, fileContext.IndexOf("="))
-                registrationCode = fileContext.Substring(fileContext.IndexOf("=") + 1)
+                machineCode = fileContentSpan.Slice(0, equalPos).ToString
+                registrationCode = fileContentSpan.Slice(equalPos + 1).ToString
 
                 Return (machineCode, registrationCode)
             Else

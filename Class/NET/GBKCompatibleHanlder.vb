@@ -62,7 +62,7 @@ Namespace ShanXingTech.Net2
                 Dim response = Await content.ReadAsStringAsync
                 If response.IsNullOrEmpty Then Return m_CharSet
 
-                Dim match = Regex.Match(response, "<meta.*?charset=""?(\w+-?\w+)""?", RegexOptions.IgnoreCase Or RegexOptions.Compiled)
+				Dim match = Regex.Match(response, "<meta.*?charset=""?(\w+-?\w+)""?", RegexOptions.IgnoreCase Or RegexOptions.Compiled)
 				Dim charSet = match.Groups(1).Value
 
 				' 如果没法从返回到的文本中获取编码方式，那就尝试根据 MediaType 决定 charset 20180627

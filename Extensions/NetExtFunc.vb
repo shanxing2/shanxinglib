@@ -190,7 +190,7 @@ Namespace ShanXingTech
 
 
             For Each cookieKeyValuePair In cookieKeyValuePairArray
-                Dim equalSymbolPostion = cookieKeyValuePair.IndexOf("=")
+                Dim equalSymbolPostion = cookieKeyValuePair.IndexOf("="c)
                 ' 有些cookie只有key而没有value,此处需要特殊处理
                 If equalSymbolPostion = -1 Then
                     name = cookieKeyValuePair.Trim()

@@ -309,11 +309,49 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' CMD执行命令并返回结果
+        ''' CMD执行命令并返回命令执行过程和执行结果
         ''' </summary>
         ''' <param name="command"></param>
         ''' <returns></returns>
         Public Shared Function CmdRun(ByVal command As String) As String
+            Dim procStartInfo = New ProcessStartInfo("cmd.exe") With {
+                .RedirectStandardOutput = True,
+                .RedirectStandardInput = True,
+                .UseShellExecute = False,
+                .RedirectStandardError = True,
+                .CreateNoWindow = True
+            }
+
+            Dim proc = New Process() With {
+                .StartInfo = procStartInfo
+            }
+
+            Dim sb = New System.Text.StringBuilder(360)
+            Try
+                If proc.Start Then
+                    proc.StandardInput.WriteLine(command & "&exit")
+                    proc.StandardInput.AutoFlush = True
+                    proc.WaitForExit()
+                    sb.AppendLine(proc.StandardOutput.ReadToEnd)
+                    proc.StandardInput.Close()
+                End If
+            Catch ex As Exception
+                Logger.WriteLine(ex)
+            Finally
+                proc?.Dispose()
+            End Try
+
+            Dim result = If(sb.Length = 0, String.Empty, sb.ToString)
+
+            Return result
+        End Function
+
+        ''' <summary>
+        ''' CMD执行命令并返回结果
+        ''' </summary>
+        ''' <param name="command"></param>
+        ''' <returns></returns>
+        Public Shared Function CmdRunOnlyReturnResult(ByVal command As String) As String
             Dim procStartInfo = New ProcessStartInfo("cmd.exe", "/c " & command) With {
                 .RedirectStandardOutput = True,
                 .UseShellExecute = False,
@@ -344,9 +382,10 @@ Namespace ShanXingTech
                 End While
             Catch ex As Exception
                 Logger.WriteLine(ex)
+            Finally
+                proc?.Dispose()
             End Try
 
-            'Dim result = proc.StandardOutput.ReadToEnd().Replace("UUID", String.Empty).Trim
             Dim result = If(sb.Length = 0, String.Empty, sb.ToString)
 
             Return result

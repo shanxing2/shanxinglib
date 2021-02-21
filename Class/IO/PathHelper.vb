@@ -21,11 +21,29 @@ Namespace ShanXingTech.IO2
         ''' <param name="filter">文件筛选器</param>
         ''' <param name="dialogTitle"></param>
         ''' <returns></returns>
-        Public Shared Function GetFileName(ByVal filter As String, ByVal dialogTitle As String) As (FileName As String, Success As Boolean)
+        Public Shared Function GetFileName(ByVal filter As String, ByVal dialogTitle As String) As (Success As Boolean, FileName As String)
+            Dim funcRst = GetFileName(filter, dialogTitle, False)
+            Return (funcRst.Success, funcRst.FileNames(0))
+        End Function
 
-            Dim filename = String.Empty
-            Dim success As Boolean
-            Dim funcRst = (filename, success)
+        ''' <summary>
+        ''' 获取选定的文件名
+        ''' </summary>
+        ''' <param name="filter">文件筛选器</param>
+        ''' <param name="dialogTitle"></param>
+        ''' <returns></returns>
+        Public Shared Function GetFileName(ByVal filter As FileFilter, ByVal dialogTitle As String, ByVal multiselect As Boolean) As (Success As Boolean, FileNames As String())
+            Return GetFileName(MakeFileFilter(filter), dialogTitle, multiselect)
+        End Function
+
+        ''' <summary>
+        ''' 获取选定的文件名
+        ''' </summary>
+        ''' <param name="filter">文件筛选器</param>
+        ''' <param name="dialogTitle"></param>
+        ''' <returns></returns>
+        Public Shared Function GetFileName(ByVal filter As String, ByVal dialogTitle As String, ByVal multiselect As Boolean) As (Success As Boolean, FileNames As String())
+            Dim funcRst = (False, Array.Empty(Of String))
 
             Try
                 Using openFileDlg As New OpenFileDialog()
@@ -40,17 +58,16 @@ Namespace ShanXingTech.IO2
                     openFileDlg.Title = dialogTitle
                     openFileDlg.Filter = filter
                     openFileDlg.FileName = String.Empty
+                    openFileDlg.Multiselect = multiselect
 
                     If openFileDlg.ShowDialog() = DialogResult.OK Then
-                        filename = openFileDlg.FileName
-
-                        If filename.Length = 0 Then Return funcRst
+                        If openFileDlg.FileName.Length = 0 Then Return funcRst
 
                         ' 记住这次选择的路径 以备下次使用
-                        Conf.Instance.LastBrowseFolder = Path.GetDirectoryName(filename)
+                        Conf.Instance.LastBrowseFolder = Path.GetDirectoryName(openFileDlg.FileName)
                         Conf.Instance.Save()
 
-                        funcRst = (filename, True)
+                        funcRst = (True, openFileDlg.FileNames)
                     End If
                 End Using
             Catch ex As Exception
@@ -66,7 +83,7 @@ Namespace ShanXingTech.IO2
         ''' <param name="filter"></param>
         ''' <param name="dialogTitle"></param>
         ''' <returns></returns>
-        Public Shared Function GetFileName(ByVal filter As FileFilter, ByVal dialogTitle As String) As (FileName As String, Success As Boolean)
+        Public Shared Function GetFileName(ByVal filter As FileFilter, ByVal dialogTitle As String) As (Success As Boolean, FileName As String)
             Dim getRst = GetFileName(MakeFileFilter(filter), dialogTitle)
 
             Return getRst
@@ -110,11 +127,11 @@ Namespace ShanXingTech.IO2
         ''' </summary>
         ''' <param name="textbox">显示选中的文件短路径；可为Nothing，不接收返回信息</param>
         ''' <returns>成功 Success=true,取消 Success=false;FileName返回选中的文件完整路径，取消返回空</returns>
-        Public Shared Function GetExcelFileName(ByVal textbox As TextBox) As (FileName As String, Success As Boolean)
+        Public Shared Function GetExcelFileName(ByVal textbox As TextBox) As (Success As Boolean, FileName As String)
             Dim filename As String = Nothing
-            Dim Success = GetExcelFileName(textbox, filename)
+            Dim success = GetExcelFileName(textbox, filename)
 
-            Return (filename, Success)
+            Return (Success, filename)
         End Function
 
         ''' <summary>
@@ -320,7 +337,7 @@ Namespace ShanXingTech.IO2
         ''' </summary>
         ''' <param name="filter">筛选器</param>
         ''' <returns>成功返回true，其余返回false</returns>
-        Public Shared Function SetSaveFileName(ByVal filter As String) As (FileName As String, Success As Boolean)
+        Public Shared Function SetSaveFileName(ByVal filter As String) As (Success As Boolean, FileName As String)
             Dim funcRst = SetSaveFileName(filter, "另存为")
 
             Return funcRst
@@ -331,7 +348,7 @@ Namespace ShanXingTech.IO2
         ''' </summary>
         ''' <param name="filter">筛选器</param>
         ''' <returns>成功返回true，其余返回false</returns>
-        Public Shared Function SetSaveFileName(ByVal filter As FileFilter) As (FileName As String, Success As Boolean)
+        Public Shared Function SetSaveFileName(ByVal filter As FileFilter) As (Success As Boolean, FileName As String)
             Return SetSaveFileName(MakeFileFilter(filter), "另存为")
         End Function
 
@@ -340,7 +357,7 @@ Namespace ShanXingTech.IO2
         ''' </summary>
         ''' <param name="filter">筛选器</param>
         ''' <returns>成功返回true，其余返回false</returns>
-        Public Shared Function SetSaveFileName(ByVal filter As FileFilter, ByVal dialogTitle As String) As (FileName As String, Success As Boolean)
+        Public Shared Function SetSaveFileName(ByVal filter As FileFilter, ByVal dialogTitle As String) As (Success As Boolean, FileName As String)
             Return SetSaveFileName(MakeFileFilter(filter), dialogTitle)
         End Function
 
@@ -363,7 +380,7 @@ Namespace ShanXingTech.IO2
         ''' </summary>
         ''' <param name="filter">筛选器</param>
         ''' <returns>成功返回true，其余返回false</returns>
-        Public Shared Function SetSaveFileName(ByVal filter As String, ByVal dialogTitle As String) As (FileName As String, Success As Boolean)
+        Public Shared Function SetSaveFileName(ByVal filter As String, ByVal dialogTitle As String) As (Success As Boolean, FileName As String)
             Dim funcRst As Boolean
             Dim fileName = String.Empty
 
@@ -395,7 +412,7 @@ Namespace ShanXingTech.IO2
                 Logger.WriteLine(ex)
             End Try
 
-            Return (fileName, funcRst)
+            Return (funcRst, fileName)
         End Function
 
         ''' <summary>

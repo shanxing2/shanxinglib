@@ -232,7 +232,7 @@ Namespace ShanXingTech.IO2
 
                 ' 把没有数据的列替换成空格，这样导出就不会乱序
                 Dim doubleDelimiter = columnDelimiter & columnDelimiter
-                While value.Contains(doubleDelimiter & doubleDelimiter)
+                While value.AsSpan.Contains((doubleDelimiter & doubleDelimiter).AsSpan, StringComparison.OrdinalIgnoreCase)
                     value = value.Replace(doubleDelimiter & doubleDelimiter, doubleDelimiter & " " & doubleDelimiter)
                 End While
 

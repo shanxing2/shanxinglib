@@ -9,7 +9,7 @@ Namespace ShanXingTech
 		''' </summary>
 		Private Shared m_LastDate As Date = Date.Now
 		Private Shared ReadOnly m_DateFormat As String = "yyyy-MM-dd HH:mm:ss"
-		Private Shared m_LogFile As String = $"C:\ShanXingTech\Log\log{Date.Now.ToString("MMdd")}.log"
+		Private Shared m_LogFile As String = $"C:\ShanXingTech\Log\log{Date.Now:yyyyMMdd}.log"
 
 #End Region
 
@@ -182,7 +182,7 @@ Namespace ShanXingTech
 			If m_LastDate.Day < Date.Now.Day OrElse
 				m_LastDate.Month < Date.Now.Month Then
 				m_LastDate = Date.Now
-				m_LogFile = $"C:\ShanXingTech\Log\log{Date.Now.ToString("MMdd")}.log"
+				m_LogFile = $"C:\ShanXingTech\Log\log{Date.Now:yyyyMMdd}.log"
 			End If
 		End Sub
 	End Class

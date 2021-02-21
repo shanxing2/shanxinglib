@@ -313,6 +313,68 @@ Namespace ShanXingTech
             End If
         End Sub
 
+        ''' <summary>
+        ''' 通过表达式筛选，然后删除匹配行
+        ''' </summary>
+        ''' <param name="dt"></param>
+        ''' <param name="expression">查询表达式，语法请看：https://www.csharp-examples.net/dataview-rowfilter/</param>
+        <Extension()>
+        Public Sub DeleteRow(ByRef dt As DataTable, ByVal expression As String)
+            Dim rows = dt.Select(expression)
+            If rows.Length = 0 Then Return
+
+            For Each row In rows
+                row.Delete()
+            Next
+            dt.AcceptChanges()
+        End Sub
+
+        ''' <summary>
+        ''' 通过表达式筛选，然后删除匹配行
+        ''' </summary>
+        ''' <param name="dt"></param>
+        <Extension()>
+        Public Sub DeleteRow(ByRef dt As DataTable, ByVal filterKeywordArray As String(), ByVal columnName As String, ByVal compareSymbol As CompareSymbol)
+            ' 关键词大于10个的话， 每10个处理一次
+            If filterKeywordArray.Length > 10 Then
+                Dim offset = 0
+                Dim count = 10
+                While offset < filterKeywordArray.Length
+                    FilterByArrayInternal(dt, filterKeywordArray, columnName, compareSymbol, offset, count)
+
+                    offset += count
+                    If offset + count > filterKeywordArray.Length Then
+                        count = filterKeywordArray.Length - offset
+                    End If
+                End While
+            Else
+                FilterByArrayInternal(dt, filterKeywordArray, columnName, compareSymbol, 0, filterKeywordArray.Length)
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <param name="offset"></param>
+        ''' <param name="count"></param>
+        Private Sub FilterByArrayInternal(ByRef dt As DataTable, ByVal arr As String(), ByVal columnName As String, ByVal compareSymbol As CompareSymbol, ByVal offset As Integer, ByVal count As Integer)
+            Try
+                Dim temp(count - 1) As String
+                For i = 0 To temp.Length - 1
+                    temp(i) = arr(offset + i).TryEscapeLikeWildcards
+                Next
+
+                Dim expression = If(compareSymbol = CompareSymbol.Contain,
+                $"{columnName} Like '%{String.Join($"%' or {columnName} like '%", temp)}%'",
+                $"{columnName} = '{String.Join($"' or {columnName} = '", temp)}'")
+
+                If expression.Length = 0 Then Return
+                DeleteRow(dt, expression)
+            Catch ex As Exception
+                Logger.WriteLine(ex)
+            End Try
+        End Sub
+
         <Extension()>
         Public Function GetColumnIndex(ByRef dgv As DataGridView, ByVal columnName As String) As Integer
             Dim funcRst As Integer

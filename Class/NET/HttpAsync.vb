@@ -10,9 +10,7 @@ Imports System.Threading
 Imports System.Threading.Tasks
 
 Imports ShanXingTech
-Imports ShanXingTech.Exception2
 Imports ShanXingTech.IO2
-Imports ShanXingTech.Text2
 
 Namespace ShanXingTech.Net2
     Public Class HttpAsync
@@ -278,6 +276,16 @@ Namespace ShanXingTech.Net2
         Private Sub ReInit(ByRef cookies As CookieContainer, ByVal allowAutoRedirect As Boolean, ByRef proxy As IWebProxy, ByVal charSet As String)
             InitInternal(cookies, allowAutoRedirect, proxy, charSet)
         End Sub
+
+        ''' <summary>
+        ''' 设置代理
+        ''' </summary>
+        ''' <param name="enabled">是否启用代理</param>
+        ''' <param name="proxy">代理信息</param>
+        Public Sub SetProxy(ByVal enabled As Boolean)
+            InitInternal(Cookies, AllowAutoRedirect, Nothing, m_CharSet)
+        End Sub
+
         ''' <summary>
         ''' 设置代理
         ''' </summary>
@@ -451,7 +459,9 @@ Namespace ShanXingTech.Net2
             Catch ex As TaskCanceledException
                 httpResponse = New HttpResponse(False, HttpStatusCode.RequestTimeout, ex.Message)
             Catch ex As Exception
-                httpResponse = New HttpResponse(False, HttpStatusCode.BadRequest, ex.ToString)
+                httpResponse = If(ex.InnerException IsNot Nothing,
+                    New HttpResponse(False, HttpStatusCode.BadRequest, ex.InnerException.Message),
+                    New HttpResponse(False, HttpStatusCode.BadRequest, ex.ToString))
             Finally
                 If cts IsNot Nothing Then
                     cts.Dispose()
@@ -617,7 +627,7 @@ Namespace ShanXingTech.Net2
                 ' 报告下载取消
                 RaiseEvent DownloadFileCompleted(Nothing, New DownloadFileCompletedEventArgs(ex, True, Nothing))
 
-                If ex.Message.IndexOf("404") = -1 Then
+                If ex.Message.AsSpan.IndexOf("404".AsSpan) = -1 Then
                     Logger.WriteLine(ex)
                 Else
                     statusCode = HttpStatusCode.NotFound
@@ -726,7 +736,7 @@ Namespace ShanXingTech.Net2
                 ' 报告下载取消
                 RaiseEvent DownloadFileCompleted(Nothing, New DownloadFileCompletedEventArgs(ex, True, Nothing))
 
-                If ex.Message.IndexOf("404") = -1 Then
+                If ex.Message.AsSpan.IndexOf("404".AsSpan) = -1 Then
                     Logger.WriteLine(ex)
                 Else
                     statusCode = HttpStatusCode.NotFound
@@ -956,9 +966,9 @@ Namespace ShanXingTech.Net2
             Do
                 httpResponse = Await TryGetAsync(url, 1)
                 tryTime -= 1
-            Loop Until (httpResponse.Success AndAlso httpResponse.Message.IndexOf(retureIfContain) > -1) OrElse tryTime <= 0
+            Loop Until (httpResponse.Success AndAlso httpResponse.Message.AsSpan.IndexOf(retureIfContain.AsSpan) > -1) OrElse tryTime <= 0
             If httpResponse.Success Then
-                httpResponse = New HttpResponse(httpResponse.Message.IndexOf(retureIfContain) > -1 OrElse tryTime > 0, httpResponse.StatusCode, httpResponse.Message, httpResponse.Header)
+                httpResponse = New HttpResponse(httpResponse.Message.AsSpan.IndexOf(retureIfContain.AsSpan) > -1 OrElse tryTime > 0, httpResponse.StatusCode, httpResponse.Message, httpResponse.Header)
             End If
 
             Return httpResponse
@@ -975,9 +985,9 @@ Namespace ShanXingTech.Net2
             Do
                 httpResponse = Await TryGetAsync(url, requestHeaders, 1)
                 tryTime -= 1
-            Loop Until (httpResponse.Success AndAlso httpResponse.Message.IndexOf(retureIfContain) > -1) OrElse tryTime <= 0
+            Loop Until (httpResponse.Success AndAlso httpResponse.Message.AsSpan.IndexOf(retureIfContain.AsSpan) > -1) OrElse tryTime <= 0
             If httpResponse.Success Then
-                httpResponse = New HttpResponse(httpResponse.Message.IndexOf(retureIfContain) > -1 OrElse tryTime > 0, httpResponse.StatusCode, httpResponse.Message, httpResponse.Header)
+                httpResponse = New HttpResponse(httpResponse.Message.AsSpan.IndexOf(retureIfContain.AsSpan) > -1 OrElse tryTime > 0, httpResponse.StatusCode, httpResponse.Message, httpResponse.Header)
             End If
 
             Return httpResponse

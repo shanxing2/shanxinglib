@@ -98,12 +98,12 @@ Namespace ShanXingTech.Net2
             'Debug.Print(String.Concat(My.Resources.CallSubName, Reflection.MethodBase.GetCurrentMethod.Name, " 转换cookie开始"))
             Try
 
-                Dim cookiesKeyValuePair As String() = cookieStr.Split({";"}, StringSplitOptions.RemoveEmptyEntries)
+                Dim cookiesKeyValuePair As String() = cookieStr.Split({";"c}, StringSplitOptions.RemoveEmptyEntries)
                 Dim cookieName As String = String.Empty
                 Dim cookieValue As String = String.Empty
 
                 For Each cookieKeyValuePair As String In cookiesKeyValuePair
-                    Dim equalSymbolPostion = cookieKeyValuePair.IndexOf("=")
+                    Dim equalSymbolPostion = cookieKeyValuePair.IndexOf("="c)
                     cookieName = cookieKeyValuePair.Substring(0, equalSymbolPostion).Trim()
                     cookieValue = cookieKeyValuePair.Substring(equalSymbolPostion + "=".Length).Trim()
 

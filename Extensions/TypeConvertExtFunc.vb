@@ -123,11 +123,11 @@ Namespace ShanXingTech
 
             Try
                 For i = 0 To (sourceString.Length - byteLength) Step byteLength
-                    Dim subString = sourceString.Substring(i, byteLength)
-                    If Not ValidateHexChar(subString) Then
+                    Dim subStr = sourceString.Substring(i, byteLength)
+                    If Not ValidateHexChar(subStr) Then
                         Exit For
                     End If
-                    sb.Append(Convert.ToChar(Integer.Parse(subString, NumberStyles.HexNumber)))
+                    sb.Append(Convert.ToChar(Integer.Parse(subStr, NumberStyles.HexNumber)))
                 Next
             Catch ex As Exception
                 Logger.WriteLine(ex)
@@ -142,14 +142,11 @@ Namespace ShanXingTech
         ''' <param name="data"></param>
         ''' <returns></returns>
         Private Function ValidateHexChar(ByVal data As String) As Boolean
-            Dim i = 0
-            While i < data.Length
-                If Not HexChars.Contains(data(i)) Then
+            For Each d In data
+                If Not HexChars.Contains(d) Then
                     Return False
                 End If
-
-                i += 1
-            End While
+            Next
 
             Return True
         End Function
@@ -1079,7 +1076,7 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 将对象序列化为二进制
+        ''' 将对象序列化为二进制并存储到本地
         ''' </summary>
         ''' <typeparam name="T"></typeparam>
         ''' <param name="instance"></param>
@@ -1106,7 +1103,7 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 将二进制反序列化为对象
+        ''' 将对象二进制文件反序列化为对象
         ''' </summary>
         ''' <typeparam name="T"></typeparam>
         ''' <param name="outInstance">接收反序列化结果的对象，可传入未初始化的对象，但不能传入 Nothing</param>

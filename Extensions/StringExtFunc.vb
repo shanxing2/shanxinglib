@@ -54,7 +54,7 @@ Namespace ShanXingTech
                 Parallel.ForEach(
                     Concurrent.Partitioner.Create(0, sourceString.Length),
                     Sub(range)
-                        For index = range.Item1 To range.Item2
+                        For index = range.Item1 To range.Item2 - 1
                             If gbkEncoding.GetByteCount(CStr(sourceString.Chars(index))) = 2 Then
                                 Threading.Interlocked.Increment(doubleByteCount)
                             End If
@@ -83,7 +83,7 @@ Namespace ShanXingTech
                 Parallel.ForEach(
                     Concurrent.Partitioner.Create(0, sourceString.Length),
                     Sub(range)
-                        For index = range.Item1 To range.Item2
+                        For index = range.Item1 To range.Item2 - 1
                             If gbkEncoding.GetByteCount(CStr(sourceString.Chars(index))) = 2 Then
                                 Threading.Interlocked.Increment(byteCount)
                                 Threading.Interlocked.Increment(byteCount)
@@ -153,7 +153,7 @@ Namespace ShanXingTech
                 Parallel.ForEach(
                     Concurrent.Partitioner.Create(0, sb.Length),
                     Sub(range)
-                        For index = range.Item1 To range.Item2
+                        For index = range.Item1 To range.Item2 - 0
                             If gbkEncoding.GetByteCount(CStr(sb.Chars(index))) = 2 Then
                                 Threading.Interlocked.Increment(doubleByteCount)
                             End If
@@ -182,7 +182,7 @@ Namespace ShanXingTech
                 Parallel.ForEach(
                     Concurrent.Partitioner.Create(0, sb.Length),
                     Sub(range)
-                        For index = range.Item1 To range.Item2
+                        For index = range.Item1 To range.Item2 - 1
                             Threading.Interlocked.Increment(gbkEncoding.GetByteCount(CStr(sb.Chars(index))))
                         Next
                     End Sub)
