@@ -153,7 +153,7 @@ Namespace ShanXingTech
                 Parallel.ForEach(
                     Concurrent.Partitioner.Create(0, sb.Length),
                     Sub(range)
-                        For index = range.Item1 To range.Item2 - 0
+                        For index = range.Item1 To range.Item2 - 1
                             If gbkEncoding.GetByteCount(CStr(sb.Chars(index))) = 2 Then
                                 Threading.Interlocked.Increment(doubleByteCount)
                             End If

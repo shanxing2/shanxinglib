@@ -57,14 +57,14 @@ Namespace ShanXingTech.Net2
             End Get
         End Property
 
-        Private m_DefaulTimeoutMilliseconds As Integer
+        Private m_DefaulTimeoutSpan As TimeSpan
         ''' <summary>
         ''' 默认的超时时间
         ''' </summary>
         ''' <returns></returns>
-        Public Property DefaulTimeoutMilliseconds As Integer
-            Set(value As Integer)
-                m_DefaulTimeoutMilliseconds = value
+        Public Property DefaulTimeoutSpan As TimeSpan
+            Set(value As TimeSpan)
+                m_DefaulTimeoutSpan = value
 
                 ' 如果已经实例化，需要同时更新 Timeout 字段以使设置生效
                 If m_HttpClient Is Nothing Then Return
@@ -72,7 +72,7 @@ Namespace ShanXingTech.Net2
                 ReInit(Cookies, AllowAutoRedirect, Proxy, DefaultCharSet)
             End Set
             Get
-                Return m_DefaulTimeoutMilliseconds
+                Return m_DefaulTimeoutSpan
             End Get
         End Property
 
@@ -217,7 +217,7 @@ Namespace ShanXingTech.Net2
         ''' <param name="charSet">解码响应文本使用的字符集，设置错误会导致乱码。设置之前，确保访问的每个网页的字符集都是一样的，否则建议使用无参数的构造函数，程序内部自动检查字符集，当然也会牺牲一点效率。</param>
         Private Sub InitInternal(ByVal cookies As CookieContainer, ByVal allowAutoRedirect As Boolean, ByRef proxy As IWebProxy, ByVal charSet As String)
             DefaultCharSet = "GBK"
-            m_DefaulTimeoutMilliseconds = 30 * 1000
+            m_DefaulTimeoutSpan = TimeSpan.FromSeconds(30)
             m_CharSet = charSet
 
             m_HttpClientHandler = New GBKCompatibleHanlder(charSet) With {
@@ -235,7 +235,7 @@ Namespace ShanXingTech.Net2
 
             m_ProgressMessageHandler = New ProgressMessageHandler(m_HttpClientHandler)
             m_HttpClient = New HttpClient(m_ProgressMessageHandler, False) With {
-                .Timeout = TimeSpan.FromMilliseconds(m_DefaulTimeoutMilliseconds)
+                .Timeout = m_DefaulTimeoutSpan
             }
             m_HttpClient.DefaultRequestHeaders.ExpectContinue = False
         End Sub
@@ -278,11 +278,9 @@ Namespace ShanXingTech.Net2
         End Sub
 
         ''' <summary>
-        ''' 设置代理
+        ''' 清空代理
         ''' </summary>
-        ''' <param name="enabled">是否启用代理</param>
-        ''' <param name="proxy">代理信息</param>
-        Public Sub SetProxy(ByVal enabled As Boolean)
+        Public Sub ClearProxy()
             InitInternal(Cookies, AllowAutoRedirect, Nothing, m_CharSet)
         End Sub
 
@@ -339,7 +337,7 @@ Namespace ShanXingTech.Net2
 
             Try
                 cts = New CancellationTokenSource
-                cts.CancelAfter(m_DefaulTimeoutMilliseconds)
+                cts.CancelAfter(m_DefaulTimeoutSpan)
                 Dim ct = cts.Token
                 ct.ThrowIfCancellationRequested()
 
@@ -355,7 +353,7 @@ Namespace ShanXingTech.Net2
 
                 success = (headResponse.StatusCode = HttpStatusCode.OK)
                 statusCode = headResponse.StatusCode
-                responseHeaders = headResponse.Headers
+                responseHeaders = headResponse?.Headers
             Catch ex As UriFormatException
                 statusCode = HttpStatusCode.BadRequest
             Catch ex As TaskCanceledException
@@ -384,7 +382,7 @@ Namespace ShanXingTech.Net2
 
             Try
                 ' 检查请求状态
-                header = response.Headers
+                header = response?.Headers
                 statusCode = response.StatusCode
                 If response.IsSuccessStatusCode Then
                     ' 获取响应文本
@@ -441,7 +439,7 @@ Namespace ShanXingTech.Net2
             Dim cts As CancellationTokenSource
             Try
                 cts = New CancellationTokenSource
-                cts.CancelAfter(m_DefaulTimeoutMilliseconds)
+                cts.CancelAfter(m_DefaulTimeoutSpan)
                 Dim ct = cts.Token
                 ct.ThrowIfCancellationRequested()
 
@@ -485,7 +483,7 @@ Namespace ShanXingTech.Net2
 
             Try
                 cts = New CancellationTokenSource
-                cts.CancelAfter(m_DefaulTimeoutMilliseconds)
+                cts.CancelAfter(m_DefaulTimeoutSpan)
                 Dim ct = cts.Token
                 ct.ThrowIfCancellationRequested()
 
@@ -690,7 +688,7 @@ Namespace ShanXingTech.Net2
                 Dim ct = cts.Token
 
                 ' 发送请求
-                response = Await m_HttpClient.SendAsync(requestMessage)
+                response = Await m_HttpClient.SendAsync(requestMessage, ct)
                 ct.ThrowIfCancellationRequested()
 
                 Dim responseStream = Await response.Content.ReadAsStreamAsync
@@ -750,7 +748,7 @@ Namespace ShanXingTech.Net2
                 End If
             End Try
 
-            Return New HttpResponse(success, statusCode, responseContent, response.Headers)
+            Return New HttpResponse(success, statusCode, responseContent, response?.Headers)
         End Function
 
         Private Sub DownloadProgressChangedEventHandler(sender As Object, e As HttpProgressEventArgs)
@@ -837,7 +835,7 @@ Namespace ShanXingTech.Net2
                     End If
                 End Try
 
-                Return New HttpResponse(success, statusCode, responseContent, response.Headers)
+                Return New HttpResponse(success, statusCode, responseContent, response?.Headers)
             End Using
         End Function
 
@@ -1129,6 +1127,7 @@ Namespace ShanXingTech.Net2
         ''' 尝试下载文件直到成功，最多尝试 <paramref name="tryTime"/> 次
         ''' </summary>
         ''' <param name="url">网页链接</param>
+        ''' <param name="fileFullPath">文件存储路径</param>
         ''' <param name="tryTime">尝试次数。成功会立刻返回，失败会继续尝试直到用完尝试次数</param>
         ''' <returns></returns>
         Public Async Function TryDownloadFileAsync(ByVal url As String, ByVal fileFullPath As String, tryTime As Integer) As Task(Of HttpResponse)
@@ -1146,6 +1145,8 @@ Namespace ShanXingTech.Net2
         ''' 尝试下载文件直到成功，最多尝试 <paramref name="tryTime"/> 次
         ''' </summary>
         ''' <param name="url">网页链接</param>
+        ''' <param name="fileFullPath">文件存储路径</param>
+        ''' <param name="requestHeaders">请求头</param>
         ''' <param name="tryTime">尝试次数。成功会立刻返回，失败会继续尝试直到用完尝试次数</param>
         ''' <returns></returns>
         Public Async Function TryDownloadFileAsync(ByVal url As String, ByVal fileFullPath As String, ByVal requestHeaders As Dictionary(Of String, String), tryTime As Integer) As Task(Of HttpResponse)
@@ -1163,6 +1164,8 @@ Namespace ShanXingTech.Net2
         ''' 尝试下载文件直到成功，最多尝试三次
         ''' </summary>
         ''' <param name="url">网页链接</param>
+        ''' <param name="fileFullPath">文件存储路径</param>
+        ''' <param name="requestHeaders">请求头</param>
         ''' <returns></returns>
         Public Async Function TryDownloadFileThreeTimeIfErrorAsync(ByVal url As String, ByVal fileFullPath As String, ByVal requestHeaders As Dictionary(Of String, String)) As Task(Of HttpResponse)
             Return Await TryDownloadFileAsync(url, fileFullPath, requestHeaders, 3)
@@ -1172,7 +1175,7 @@ Namespace ShanXingTech.Net2
         ''' 异步上传文件
         ''' </summary>
         ''' <param name="uploadInfo">上传文件需要的相关信息</param>
-        ''' <param name="requestHeaders"></param>
+        ''' <param name="requestHeaders">请求头</param>
         ''' <returns></returns>
         Public Async Function UploadFileAsync(ByVal uploadInfo As UploadInfo, ByVal requestHeaders As Dictionary(Of String, String)) As Task(Of HttpResponse)
             Return Await InternalUploadFileAsync(uploadInfo, requestHeaders)

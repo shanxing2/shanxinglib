@@ -1,7 +1,7 @@
 ﻿Imports System.ComponentModel
 
 
-Namespace ShanXingTech.IO2
+Namespace ShanXingTech
 
     ''' <summary>
     ''' 文件过滤器
@@ -36,10 +36,15 @@ Namespace ShanXingTech.IO2
         <Description("Access 数据库(*.mdb;*.mde;*.accdb;*.accde)|*.mdb;*.mde;*.accdb;*.accde")>
         Access = 8
         ''' <summary>
+        ''' 可执行程序(*.exe)|*.exe
+        ''' </summary>
+        <Description("可执行程序(*.exe)|*.exe")>
+        EXE = 16
+        ''' <summary>
         ''' 所有文件(*.*)|*.*
         ''' </summary>
         <Description("所有文件(*.*)|*.*")>
-        All = EXCEL Or TXT Or CSV Or Access
+        All = EXCEL Or TXT Or CSV Or Access Or EXE
     End Enum
 
 End Namespace

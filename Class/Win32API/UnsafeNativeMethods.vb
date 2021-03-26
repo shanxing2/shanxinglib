@@ -23,7 +23,7 @@ Namespace ShanXingTech.Win32API
 		''' 判断文件夹是否为空
 		''' </summary>
 		''' <param name="pszPath"></param>
-		''' <returns>Returns TRUE if pszPath is an empty directory. Returns FALSE if pszPath is not a directory, or if it contains at least one file other than "." or "..".</returns>
+		''' <returns>Returns TRUE if pszPath is an empty directory. Returns FALSE if pszPath is not a directory, or if it contains at least one file other than "."c or "..".</returns>
 		<DllImport(ExternDll.Shlwapi, SetLastError:=True, CharSet:=CharSet.Unicode)>
 		Public Function PathIsDirectoryEmptyA(ByVal pszPath As String) As Boolean
         End Function

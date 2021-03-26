@@ -352,10 +352,12 @@ Namespace ShanXingTech
         ''' <param name="command"></param>
         ''' <returns></returns>
         Public Shared Function CmdRunOnlyReturnResult(ByVal command As String) As String
+            ' /c /Close的简写,命令运行之后关闭窗口命令运行之后关闭窗口,对应的是/K 是 /Keep
             Dim procStartInfo = New ProcessStartInfo("cmd.exe", "/c " & command) With {
                 .RedirectStandardOutput = True,
                 .UseShellExecute = False,
-                .CreateNoWindow = True
+                .CreateNoWindow = True,
+                .RedirectStandardError = True
             }
 
             Dim proc = New Process() With {
@@ -363,23 +365,39 @@ Namespace ShanXingTech
             }
 
             Dim sb = New System.Text.StringBuilder(360)
-            Dim readToEnd As Boolean
 
             Try
-                proc.Start()
-                proc.BeginOutputReadLine()
+                Dim procExit As Boolean
+
 
                 AddHandler proc.OutputDataReceived,
                   Sub(sender, e)
-                      sb.AppendLine(e.Data)
                       If e.Data Is Nothing Then
-                          readToEnd = True
+                          procExit = True
+                          Return
                       End If
+                      sb.AppendLine(e.Data)
                   End Sub
 
-                While Not readToEnd
+                proc.Start()
+
+                ' 尝试等待退出，有错误的话就会退出，不再需要执行后面的代码
+                Windows2.Delay(100)
+                If proc.HasExited AndAlso proc.ExitCode <> 0 Then
+                    sb.AppendLine(proc.StandardError.ReadToEnd)
+                    procExit = True
+                    Exit Try
+                End If
+
+                proc.BeginOutputReadLine()
+
+                While Not procExit
                     Windows2.Delay(1)
                 End While
+
+                If proc.ExitCode <> 0 Then
+                    sb.AppendLine(proc.StandardError.ReadToEnd)
+                End If
             Catch ex As Exception
                 Logger.WriteLine(ex)
             Finally

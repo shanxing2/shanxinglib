@@ -521,7 +521,7 @@ Namespace ShanXingTech
 
         '    ' 如果不包含小数点“.”，而且字符串长度大于integer最大值的长度(包含负数)，抛出异常
         '    ' 此处只能从长度简单判断，如果不符合上面的条件，有可能会抛出异常
-        '    If value.IndexOf(".") = -1 AndAlso value.Length > CStr(T.MaxValue).Length + 1 Then
+        '    If value.IndexOf("."c) = -1 AndAlso value.Length > CStr(T.MaxValue).Length + 1 Then
         '        Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(value)))
         '    End If
 
@@ -544,7 +544,7 @@ Namespace ShanXingTech
 
             ' 如果不包含小数点“.”，而且字符串长度大于integer最大值的长度(包含负数)，抛出异常
             ' 此处只能从长度简单判断，如果不符合上面的条件，有可能会抛出异常
-            If value.IndexOf(".") = -1 AndAlso value.Length > CStr(Integer.MaxValue).Length + 1 Then
+            If value.IndexOf("."c) = -1 AndAlso value.Length > CStr(Integer.MaxValue).Length + 1 Then
                 Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(value)))
             End If
 
@@ -569,7 +569,7 @@ Namespace ShanXingTech
 
             ' 如果不包含小数点“.”，而且字符串长度大于integer最大值的长度(包含负数)，抛出异常
             ' 此处只能从长度简单判断，如果不符合上面的条件，有可能会抛出异常
-            If value.IndexOf(".") = -1 AndAlso value.Length > CStr(Integer.MaxValue).Length + 1 Then
+            If value.IndexOf("."c) = -1 AndAlso value.Length > CStr(Integer.MaxValue).Length + 1 Then
                 Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(value)))
             End If
 
@@ -592,7 +592,7 @@ Namespace ShanXingTech
 
             ' 如果不包含小数点“.”，而且字符串长度大于integer最大值的长度(包含负数)，抛出异常
             ' 此处只能从长度简单判断，如果不符合上面的条件，有可能会抛出异常
-            If value.IndexOf(".") = -1 AndAlso value.Length > CStr(Long.MaxValue).Length + 1 Then
+            If value.IndexOf("."c) = -1 AndAlso value.Length > CStr(Long.MaxValue).Length + 1 Then
                 Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(value)))
             End If
 
@@ -617,7 +617,7 @@ Namespace ShanXingTech
 
             ' 如果不包含小数点“.”，而且字符串长度大于integer最大值的长度(包含负数)，抛出异常
             ' 此处只能从长度简单判断，如果不符合上面的条件，有可能会抛出异常
-            If value.IndexOf(".") = -1 AndAlso value.Length > CStr(ULong.MaxValue).Length + 1 Then
+            If value.IndexOf("."c) = -1 AndAlso value.Length > CStr(ULong.MaxValue).Length + 1 Then
                 Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(value)))
             End If
 
@@ -639,7 +639,7 @@ Namespace ShanXingTech
 
             ' 如果不包含小数点“.”，而且字符串长度大于integer最大值的长度，抛出异常.0
             ' 此处只能从长度简单判断，如果不符合上面的条件，有可能会抛出异常
-            If value.IndexOf(".") = -1 AndAlso value.Length > CStr(Single.MaxValue).Length Then
+            If value.IndexOf("."c) = -1 AndAlso value.Length > CStr(Single.MaxValue).Length Then
                 Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(value)))
             End If
 
@@ -661,7 +661,7 @@ Namespace ShanXingTech
 
             ' 如果不包含小数点“.”，而且字符串长度大于integer最大值的长度，抛出异常.0
             ' 此处只能从长度简单判断，如果不符合上面的条件，有可能会抛出异常
-            If value.IndexOf(".") = -1 AndAlso value.Length > CStr(Double.MaxValue).Length Then
+            If value.IndexOf("."c) = -1 AndAlso value.Length > CStr(Double.MaxValue).Length Then
                 Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(value)))
             End If
 

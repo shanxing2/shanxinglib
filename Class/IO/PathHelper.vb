@@ -23,7 +23,7 @@ Namespace ShanXingTech.IO2
         ''' <returns></returns>
         Public Shared Function GetFileName(ByVal filter As String, ByVal dialogTitle As String) As (Success As Boolean, FileName As String)
             Dim funcRst = GetFileName(filter, dialogTitle, False)
-            Return (funcRst.Success, funcRst.FileNames(0))
+            Return (funcRst.Success, If(funcRst.Success, funcRst.FileNames(0), String.Empty))
         End Function
 
         ''' <summary>

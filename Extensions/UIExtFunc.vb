@@ -434,12 +434,13 @@ Namespace ShanXingTech
         ''' <param name="yOffset">要打开的窗体的初始位置y坐标相对于鼠标y坐标的偏移</param>
         ''' <param name="topMost">是否为模式窗体</param>
         <Extension()>
-        Public Sub ShowFollowMousePosition(Of T As Form)(ByRef childForm As T, ByVal actionWhileMouseLeave As MouseLeaveAction, ByVal yOffset As Integer, ByVal topMost As Boolean)
+        Public Sub ShowFollowMousePosition(Of T As Form)(ByRef childForm As T, ByVal actionWhileMouseLeave As MouseLeaveAction, ByVal offset As Point, ByVal topMost As Boolean)
             ' 计算鼠标相对于屏幕的位置，窗体出现的位置以 mousePoint 为参考点
             ' 如果 子窗体的‘下、右’任一部超出了屏幕，则自动向‘上、左’调整到能显示完整窗体为止
             Dim mousePoint = childForm.PointToClient(Cursor.Position)
-            Dim childFormX = mousePoint.X
-            Dim childFormY = mousePoint.Y + yOffset
+            mousePoint = Cursor.Position
+            Dim childFormX = mousePoint.X + offset.X
+            Dim childFormY = mousePoint.Y + offset.Y
 
             Dim currentWorkingArea = Screen.FromPoint(mousePoint).WorkingArea
             Dim currentWorkingAreaRectangle = New Rectangle(currentWorkingArea.X, currentWorkingArea.Y, currentWorkingArea.Width + Math.Abs(currentWorkingArea.X), currentWorkingArea.Height + Math.Abs(currentWorkingArea.Y))
@@ -473,6 +474,31 @@ Namespace ShanXingTech
             Else
                 childForm.Show()
             End If
+        End Sub
+
+        ''' <summary>
+        ''' 在鼠标光标位置处显示窗体
+        ''' </summary>
+        ''' <param name="childForm">要打开的窗体</param>
+        ''' <param name="actionWhileMouseLeave">鼠标移出窗体时，需要执行的动作</param>
+        ''' <param name="yOffset">要打开的窗体的初始位置y坐标相对于鼠标y坐标的偏移</param>
+        ''' <param name="topMost">是否为模式窗体</param>
+        <Extension()>
+        Public Sub ShowFollowMousePosition(Of T As Form)(ByRef childForm As T, ByVal actionWhileMouseLeave As MouseLeaveAction, ByVal yOffset As Integer, ByVal topMost As Boolean)
+            ShowFollowMousePosition(childForm, actionWhileMouseLeave, New Point(0, yOffset), topMost)
+        End Sub
+
+        ''' <summary>
+        ''' 在鼠标光标位置处显示窗体
+        ''' </summary>
+        ''' <param name="childForm">要打开的窗体</param>
+        ''' <param name="actionWhileMouseLeave">鼠标移出窗体时，需要执行的动作</param>
+        ''' <param name="xOffset">要打开的窗体的初始位置x坐标相对于鼠标x坐标的偏移</param>
+        ''' <param name="yOffset">要打开的窗体的初始位置y坐标相对于鼠标y坐标的偏移</param>
+        ''' <param name="topMost">是否为模式窗体</param>
+        <Extension()>
+        Public Sub ShowFollowMousePosition(Of T As Form)(ByRef childForm As T, ByVal actionWhileMouseLeave As MouseLeaveAction, ByVal xOffset As Integer, ByVal yOffset As Integer, ByVal topMost As Boolean)
+            ShowFollowMousePosition(childForm, actionWhileMouseLeave, New Point(xOffset, yOffset), topMost)
         End Sub
 
         ''' <summary>

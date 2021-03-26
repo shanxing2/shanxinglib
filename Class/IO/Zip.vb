@@ -35,7 +35,7 @@ Namespace ShanXingTech.IO2.Compression
 			Try
 				' 如果得到的文件名没有包含后缀，则自动补上后缀 “.zip”
 				Dim tempFileName = IO.Path.GetFileName(zipFileFullPath)
-				If tempFileName.IndexOf(".") = -1 Then
+				If tempFileName.IndexOf("."c) = -1 Then
 					zipFileFullPath += ".zip"
 				End If
 			Catch ex As Exception
