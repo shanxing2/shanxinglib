@@ -533,7 +533,7 @@ Namespace ShanXingTech.Net2
             If postContentEncoding.CodePage = Text.Encoding.UTF8.CodePage Then
                 content = New FormUrlEncodedContent(postContentKvp)
             Else
-                Dim postContent = EncodeContent(postContentKvp, postContentEncoding)
+                Dim postContent = EncodeContent(postContentKvp)
                 content = New StringContent(postContent, postContentEncoding)
             End If
             Dim mediaTypeHeaderValue = New MediaTypeHeaderValue(mediaType)
@@ -549,9 +549,8 @@ Namespace ShanXingTech.Net2
         ''' 对请求文本进行UrlEncode
         ''' </summary>
         ''' <param name="postContentKvp"></param>
-        ''' <param name="postContentEncoding"></param>
         ''' <returns></returns>
-        Private Function EncodeContent(ByVal postContentKvp As IEnumerable(Of KeyValuePair(Of String, String)), ByVal postContentEncoding As Text.Encoding) As String
+        Private Function EncodeContent(ByVal postContentKvp As IEnumerable(Of KeyValuePair(Of String, String))) As String
             Dim sb = New StringBuilder(361)
             For Each kvp As KeyValuePair(Of String, String) In postContentKvp
                 If sb.Length > 0 Then
@@ -559,7 +558,7 @@ Namespace ShanXingTech.Net2
                 End If
                 sb.Append(kvp.Key)
                 sb.Append("="c)
-                sb.Append(kvp.Value.UrlEncode(postContentEncoding))
+                sb.Append(kvp.Value.UrlEncode)
             Next
             Dim postContent = sb.ToString
             Return postContent

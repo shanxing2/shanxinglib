@@ -4,25 +4,13 @@ Imports System.IO.Compression
 Imports System.Runtime.CompilerServices
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Text
+Imports System.Text.Json
 Imports System.Threading.Tasks
-Imports System.Web
-Imports System.Web.Script.Serialization
-
-Imports ShanXingTech.Text2
+'Imports System.Web
 
 Namespace ShanXingTech
     Partial Public Module ExtensionFunc
 #Region "属性区"
-        ''' <summary>
-        ''' 序列化器，可用于对象实例（如某某实体）的序列化或者字符串（如Json字符串）到实体的反序列化
-        ''' </summary>
-        ''' <returns></returns>
-        Public ReadOnly Property MSJsSerializer As JavaScriptSerializer
-            Get
-                Return If(MSJsSerializer, New JavaScriptSerializer)
-            End Get
-        End Property
-
         ''' <summary>
         ''' 合法的16进制字符表
         ''' </summary>
@@ -917,7 +905,7 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function Deserialize(Of T As Class)(ByVal input As String) As T
-            Return MSJsSerializer.Deserialize(Of T)(input)
+            Return JsonSerializer.Deserialize(Of T)(input)
         End Function
 
         ''' <summary>
@@ -927,11 +915,11 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function Serialize(Of T As Class)(ByVal source As T) As String
-            Return MSJsSerializer.Serialize(source)
+            Return JsonSerializer.Serialize(source)
         End Function
 
         ''' <summary>
-        ''' 字符串形式的键值对转换为集合。此函数与类库自带的函数 <see cref="Web.HttpUtility.ParseQueryString"/> 不同，不需要提前编码；如果值域包含特殊字符如“=、+”等，类库自带的函数 <see cref="Web.HttpUtility.ParseQueryString"/> 无法正常解析
+        ''' 字符串形式的键值对转换为集合。此函数与类库自带的函数 <see cref="Net.WebUtility.ParseQueryString"/> 不同，不需要提前编码；如果值域包含特殊字符如“=、+”等，类库自带的函数 <see cref="Net.WebUtility.ParseQueryString"/> 无法正常解析
         ''' </summary>
         ''' <param name="kvString"></param>
         ''' <param name="urlEncoded"><paramref name="kvString"/> 是否已经编码</param>
@@ -940,7 +928,7 @@ Namespace ShanXingTech
         <Extension()>
         Public Function ToKeyValuePairs(kvString As String, urlEncoded As Boolean, encoding As Encoding) As IEnumerable(Of KeyValuePair(Of String, String))
             ' 如果已经编码过，那就先解码
-            If urlEncoded Then kvString = HttpUtility.UrlDecode(kvString, encoding)
+            If urlEncoded Then kvString = Net.WebUtility.UrlDecode(kvString)
 
             Dim list As New List(Of KeyValuePair(Of String, String))(8)
             Dim l = If(kvString <> Nothing, kvString.Length, 0)
@@ -991,7 +979,7 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 字符串形式的键值对转换为集合。此函数与类库自带的函数 <see cref="Web.HttpUtility.ParseQueryString"/> 不同，不需要提前编码；如果值域包含特殊字符如“=、+”等，类库自带的函数 <see cref="Web.HttpUtility.ParseQueryString"/> 无法正常解析
+        ''' 字符串形式的键值对转换为集合。此函数与类库自带的函数 <see cref="Net.WebUtility.ParseQueryString"/> 不同，不需要提前编码；如果值域包含特殊字符如“=、+”等，类库自带的函数 <see cref="Net.WebUtility.ParseQueryString"/> 无法正常解析
         ''' </summary>
         ''' <param name="kvString"></param>
         ''' <param name="urlEncoded"><paramref name="kvString"/> 是否已经编码</param>
@@ -1002,7 +990,7 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 字符串形式的键值对转换为集合。此函数与类库自带的函数 <see cref="Web.HttpUtility.ParseQueryString"/> 不同，不需要提前编码；如果值域包含特殊字符如“=、+”等，类库自带的函数 <see cref="Web.HttpUtility.ParseQueryString"/> 无法正常解析。
+        ''' 字符串形式的键值对转换为集合。此函数与类库自带的函数 <see cref="Net.WebUtility.ParseQueryString"/> 不同，不需要提前编码；如果值域包含特殊字符如“=、+”等，类库自带的函数 <see cref="Net.WebUtility.ParseQueryString"/> 无法正常解析。
         ''' <para>注：<paramref name="kvString"/> 必须是未执行过 <see cref="HttpUtility.UrlEncode(String, Encoding)"/> 的字符串</para>
         ''' </summary>
         ''' <param name="kvString"></param>

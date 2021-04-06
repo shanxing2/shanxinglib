@@ -379,8 +379,8 @@ Namespace ShanXingTech
         ''' <param name="sourceString"></param>
         ''' <returns></returns>
         <Extension()>
-        Public Function UrlEncode(ByVal sourceString As String, ByVal encoding As Encoding) As String
-            Return UrlEncode(sourceString, encoding, UpperLowerCase.Lower)
+        Public Function UrlEncode(ByVal sourceString As String) As String
+            Return UrlEncode(sourceString, UpperLowerCase.Lower)
         End Function
 
         ''' <summary>
@@ -391,16 +391,16 @@ Namespace ShanXingTech
         ''' <param name="lUCase">编码结果为大写还是小写</param>
         ''' <returns></returns>
         <Extension()>
-        Public Function UrlEncode(ByVal sourceString As String, ByVal encoding As Encoding, ByVal lUCase As UpperLowerCase) As String
+        Public Function UrlEncode(ByVal sourceString As String, ByVal lUCase As UpperLowerCase) As String
             If sourceString.IsNullOrEmpty Then Return String.Empty
 
             If lUCase = UpperLowerCase.Lower Then
-                Return Web.HttpUtility.UrlEncode(sourceString, encoding)
+                Return Net.WebUtility.UrlEncode(sourceString)
             Else
-                Dim funcRst = Web.HttpUtility.UrlEncode(sourceString, encoding)
+                Dim funcRst = Net.WebUtility.UrlEncode(sourceString)
                 Dim sb = New StringBuilder(sourceString.Length * 3)
                 For Each c In sourceString
-                    Dim ue = Web.HttpUtility.UrlEncode(c, encoding)
+                    Dim ue = Net.WebUtility.UrlEncode(c)
                     If c = ue Then
                         sb.Append(c)
                     Else
@@ -467,8 +467,8 @@ Namespace ShanXingTech
         ''' <param name="encoding"></param>
         ''' <returns></returns>
         <Extension()>
-        Public Function UrlDecode(ByVal sourceString As String, ByVal encoding As Encoding) As String
-            Dim funcRst = Web.HttpUtility.UrlDecode(sourceString, encoding)
+        Public Function UrlDecode(ByVal sourceString As String) As String
+            Dim funcRst = Net.WebUtility.UrlDecode(sourceString)
 
             Return funcRst
         End Function
@@ -480,7 +480,7 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function HtmlEncode(ByVal sourceString As String) As String
-            Dim funcRst = Web.HttpUtility.HtmlEncode(sourceString)
+            Dim funcRst = Net.WebUtility.HtmlEncode(sourceString)
 
             Return funcRst
         End Function
@@ -492,9 +492,7 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function HtmlDecode(ByVal sourceString As String) As String
-            Dim funcRst As String = String.Empty
-
-            funcRst = Web.HttpUtility.HtmlDecode(sourceString)
+            Dim funcRst = Net.WebUtility.HtmlDecode(sourceString)
 
             Return funcRst
         End Function
@@ -817,11 +815,7 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function IsMatch(ByVal input As String, ByVal pattern As String, ByVal options As RegexOptions) As Boolean
-            If input.IsNullOrEmpty Then
-                Return False
-            End If
-
-            Return Regex.IsMatch(input, pattern, options)
+            Return Not input.IsNullOrEmpty AndAlso Regex.IsMatch(input, pattern, options)
         End Function
 
         ''' <summary>

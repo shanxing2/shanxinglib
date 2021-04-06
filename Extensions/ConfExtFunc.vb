@@ -98,11 +98,9 @@ Namespace ShanXingTech
             ' 如果程序集名一样，说明是类库(Conf 基类所在的库)自身 Conf 调用,需要加上入口程序集的名称，这样每个调用类库的程序都会有一个属于自己的conf文件，而不是共享
             ' 如果需要所有程序共享类库设置，那就直接返回 currentAssemblyName 即可
             Dim isCallByOwn = currentAssemblyName.Equals(topCallingAssemblyName, StringComparison.OrdinalIgnoreCase)
-            If isCallByOwn Then
-                Return ($"{Reflection.Assembly.GetEntryAssembly.GetName.Name}\{currentAssemblyName}", isCallByOwn)
-            Else
-                Return (topCallingAssemblyName, isCallByOwn)
-            End If
+            Return If(isCallByOwn,
+                ($"{Reflection.Assembly.GetEntryAssembly.GetName.Name}\{currentAssemblyName}", isCallByOwn),
+                (topCallingAssemblyName, isCallByOwn))
         End Function
 
         ''' <summary>

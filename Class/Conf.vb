@@ -1,4 +1,6 @@
-﻿Imports ShanXingTech
+﻿Imports System.Text.Json
+
+Imports ShanXingTech
 
 ''' <summary>
 ''' 配置信息辅助类。由于VB.NET自带的 <see cref="My.Settings"/> 工具处于调试模式时，可能不按照预期运行（不保存用户设置值），因此造此类以替代。
@@ -50,7 +52,7 @@ Friend NotInheritable Class Conf
                 IO2.Reader.ReadFile(m_ConfPath, Text.Encoding.UTF8).FromHexString(True),
                 New Conf With {.ProductName = productName}.Serialize)
 
-            Instance = MSJsSerializer.Deserialize(Of Conf)(json)
+            Instance = JsonSerializer.Deserialize(Of Conf)(json)
         Catch ex As Exception
             Throw
         Finally
