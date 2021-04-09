@@ -1,5 +1,4 @@
-﻿Imports System.Text.Json
-
+﻿
 Imports ShanXingTech
 
 ''' <summary>
@@ -52,7 +51,7 @@ Friend NotInheritable Class Conf
                 IO2.Reader.ReadFile(m_ConfPath, Text.Encoding.UTF8).FromHexString(True),
                 New Conf With {.ProductName = productName}.Serialize)
 
-            Instance = JsonSerializer.Deserialize(Of Conf)(json)
+            Instance = MSJsSerializer.Deserialize(Of Conf)(json)
         Catch ex As Exception
             Throw
         Finally

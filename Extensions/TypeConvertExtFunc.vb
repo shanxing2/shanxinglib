@@ -4,13 +4,23 @@ Imports System.IO.Compression
 Imports System.Runtime.CompilerServices
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Text
-Imports System.Text.Json
 Imports System.Threading.Tasks
+Imports System.Web.Script.Serialization
 'Imports System.Web
 
 Namespace ShanXingTech
     Partial Public Module ExtensionFunc
 #Region "属性区"
+        ''' <summary>
+        ''' 序列化器，可用于对象实例（如某某实体）的序列化或者字符串（如Json字符串）到实体的反序列化
+        ''' </summary>
+        ''' <returns></returns>
+        Public ReadOnly Property MSJsSerializer As JavaScriptSerializer
+            Get
+                Return If(MSJsSerializer, New JavaScriptSerializer)
+            End Get
+        End Property
+
         ''' <summary>
         ''' 合法的16进制字符表
         ''' </summary>
@@ -905,7 +915,7 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function Deserialize(Of T As Class)(ByVal input As String) As T
-            Return JsonSerializer.Deserialize(Of T)(input)
+            Return MSJsSerializer.Deserialize(Of T)(input)
         End Function
 
         ''' <summary>
@@ -915,7 +925,7 @@ Namespace ShanXingTech
         ''' <returns></returns>
         <Extension()>
         Public Function Serialize(Of T As Class)(ByVal source As T) As String
-            Return JsonSerializer.Serialize(source)
+            Return MSJsSerializer.Serialize(source)
         End Function
 
         ''' <summary>
