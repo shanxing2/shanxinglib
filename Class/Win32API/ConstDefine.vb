@@ -17,6 +17,11 @@
         ''' </summary>
         Public Const SND_LOOP = &H8
         Public Const INTERNET_OPTION_SUPPRESS_BEHAVIOR As Integer = 81
+        ''' <summary>
+        ''' WebBrowser不与IE或其他进程共享cookie,也就是每个进程具有独立Cookie
+        ''' Suppresses the persistence of cookies, even if the server has specified them as persistent
+        ''' Version:  Requires Internet Explorer 8.0 or later.
+        ''' </summary>
         Public Const INTERNET_SUPPRESS_COOKIE_PERSIST As Integer = 3
         Public Const INTERNET_SUPPRESS_COOKIE_PERSIST_RESET As Integer = 4
         Public Const INTERNET_OPTION_END_BROWSER_SESSION As Integer = 42

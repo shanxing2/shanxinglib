@@ -434,13 +434,13 @@ Namespace ShanXingTech
         ''' <param name="yOffset">要打开的窗体的初始位置y坐标相对于鼠标y坐标的偏移</param>
         ''' <param name="topMost">是否为模式窗体</param>
         <Extension()>
-        Public Sub ShowFollowMousePosition(Of T As Form)(ByRef childForm As T, ByVal actionWhileMouseLeave As MouseLeaveAction, ByVal offset As Point, ByVal topMost As Boolean)
+        Public Sub ShowFollowMousePosition(Of T As Form)(ByRef childForm As T, ByVal actionWhileMouseLeave As MouseLeaveAction, ByVal yOffset As Point, ByVal topMost As Boolean)
             ' 计算鼠标相对于屏幕的位置，窗体出现的位置以 mousePoint 为参考点
             ' 如果 子窗体的‘下、右’任一部超出了屏幕，则自动向‘上、左’调整到能显示完整窗体为止
             Dim mousePoint = childForm.PointToClient(Cursor.Position)
             mousePoint = Cursor.Position
-            Dim childFormX = mousePoint.X + offset.X
-            Dim childFormY = mousePoint.Y + offset.Y
+            Dim childFormX = mousePoint.X + yOffset.X
+            Dim childFormY = mousePoint.Y + yOffset.Y
 
             Dim currentWorkingArea = Screen.FromPoint(mousePoint).WorkingArea
             Dim currentWorkingAreaRectangle = New Rectangle(currentWorkingArea.X, currentWorkingArea.Y, currentWorkingArea.Width + Math.Abs(currentWorkingArea.X), currentWorkingArea.Height + Math.Abs(currentWorkingArea.Y))
@@ -644,11 +644,9 @@ Namespace ShanXingTech
                     End If
                 Next
 
-                If colIndex <> -1 Then
-                    result = dgv.CurrentRow.Cells(colIndex).Value.ToString()
-                Else
-                    result = dgv.CurrentRow.Cells(columnName).Value.ToString()
-                End If
+                result = If(colIndex <> -1,
+                    dgv.CurrentRow.Cells(colIndex).Value.ToString(),
+                    dgv.CurrentRow.Cells(columnName).Value.ToString())
             Catch ex As Exception
                 Logger.WriteLine(ex)
             End Try
@@ -685,17 +683,13 @@ Namespace ShanXingTech
                 Next
 
                 If colIndex <> -1 Then
-                    If dgv.CurrentRow.Index = 0 Then
-                        result = dgv.Rows(0).Cells(colIndex).Value
-                    Else
-                        result = dgv.Rows(dgv.CurrentRow.Index - 1).Cells(colIndex).Value
-                    End If
+                    result = If(dgv.CurrentRow.Index = 0,
+                        dgv.Rows(0).Cells(colIndex).Value,
+                        dgv.Rows(dgv.CurrentRow.Index - 1).Cells(colIndex).Value)
                 Else
-                    If dgv.CurrentRow.Index = 0 Then
-                        result = dgv.Rows(0).Cells(columnName).Value
-                    Else
-                        result = dgv.Rows(dgv.CurrentRow.Index - 1).Cells(columnName).Value
-                    End If
+                    result = If(dgv.CurrentRow.Index = 0,
+                        dgv.Rows(0).Cells(columnName).Value,
+                        dgv.Rows(dgv.CurrentRow.Index - 1).Cells(columnName).Value)
                 End If
             Catch ex As Exception
                 Logger.WriteLine(ex)

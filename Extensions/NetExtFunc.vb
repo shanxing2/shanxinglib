@@ -5,7 +5,9 @@ Imports System.Runtime.CompilerServices
 Imports System.Runtime.InteropServices
 Imports System.Text
 Imports System.Windows.Forms
+
 Imports Microsoft.Win32
+
 Imports ShanXingTech
 Imports ShanXingTech.Text2
 Imports ShanXingTech.Win32API
@@ -71,7 +73,7 @@ Namespace ShanXingTech
             ' y = kx
             Dim k = (htmlTagPointOfScrollY + browserPointOfScreen.Y) / (browserPointOfScreen.X + htmlTagPointOfScrollX)
             Dim y = 0
-            Dim hwndOfBrowser = browser.GetBrowserReallyHwnd
+            Dim hwndOfBrowser = browser.GetBrowserTrueHwnd
             For x = browserPointOfScreen.X To browserPointOfScreen.X + htmlTagPointOfScrollX
                 y = CInt(x * k)
                 If backgroundOperate Then
@@ -97,8 +99,67 @@ Namespace ShanXingTech
         End Sub
 
         ''' <summary>
+        ''' 真实模拟人工鼠标点击元素，与使用 <see cref="HtmlElement.InvokeMember(String)"/> 执行’Click‘操作不一样。
+        ''' </summary>
+        ''' <param name="element">要点击的元素</param>
+        ''' <param name="browser"><see cref="WebBrowser"/>>浏览器</param>
+        ''' <param name="backgroud">是否后台操作（不影响鼠标正常工作）</param>
+        <Extension()>
+        Public Sub TrueMouseClick(ByRef element As HtmlElement, ByRef browser As WebBrowser, ByVal backgroud As Boolean)
+            If element Is Nothing Then Return
+
+            If backgroud Then
+                TrueMouseClick(element, browser.GetBrowserTrueHwnd)
+            Else
+                TrueMouseClickForeground(element, browser)
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' 真实模拟人工后台鼠标点击元素，与使用 <see cref="HtmlElement.InvokeMember(String)"/> 执行’Click‘操作不一样。
+        ''' </summary>
+        ''' <param name="element">要点击的元素</param>
+        ''' <param name="browserTrueHwnd"><see cref="WebBrowser"/>>浏览器的真实句柄，而不是 <see cref="WebBrowser.Handle"/></param>
+        <Extension()>
+        Public Sub TrueMouseClick(ByRef element As HtmlElement, ByVal browserTrueHwnd As IntPtr)
+            If element Is Nothing Then Return
+
+            ' 获取 元素中心 的相对于滚动条的位置
+            Dim elementPointOfScrollX = element.OffsetScrollPoint.X + element.OffsetRectangle.Width \ 2
+            Dim elementPointOfScrollY = element.OffsetScrollPoint.Y + element.OffsetRectangle.Height \ 2
+            SendMessage(browserTrueHwnd, MouseEventFlags.WM_LBUTTONDOWN, 0, elementPointOfScrollX + (elementPointOfScrollY << 16))
+            SendMessage(browserTrueHwnd, MouseEventFlags.WM_LBUTTONUP, 0, elementPointOfScrollX + (elementPointOfScrollY << 16))
+        End Sub
+
+        ''' <summary>
+        ''' 真实模拟人工鼠标点击元素，与使用 <see cref="HtmlElement.InvokeMember(String)"/> 执行’Click‘操作不一样。
+        ''' </summary>
+        ''' <param name="element">要点击的元素</param>
+        ''' <param name="browser"><see cref="WebBrowser"/>>浏览器</param>
+        <Extension()>
+        Public Sub TrueMouseClickForeground(ByRef element As HtmlElement, ByRef browser As WebBrowser)
+            If element Is Nothing Then Return
+
+            ' 获取 元素中心 的相对于滚动条的位置
+            Dim elementPointOfScrollX = element.OffsetScrollPoint.X + element.OffsetRectangle.Width \ 2
+            Dim elementPointOfScrollY = element.OffsetScrollPoint.Y + element.OffsetRectangle.Height \ 2
+            ' 获取browser相对于屏幕的位置
+            Dim browserPointOfScreen = browser.PointToScreen(New Point(0, 0))
+            ' x起点为随机浏览器左上角到滑块左上角之间的x轴一点
+            Dim elementPointOfScreen = New Point(browserPointOfScreen.X + elementPointOfScrollX, browserPointOfScreen.Y + elementPointOfScrollY)
+            SetCursorPos(elementPointOfScreen.X, elementPointOfScreen.Y)
+            Mouse_Event(MouseEventFlags.MOUSEEVENTF_ABSOLUTE Or MouseEventFlags.MOUSEEVENTF_LEFTDOWN Or MouseEventFlags.MOUSEEVENTF_LEFTUP, elementPointOfScreen.X, elementPointOfScreen.Y, 0, 0)
+            Application.DoEvents()
+            Mouse_Event(MouseEventFlags.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
+            Mouse_Event(MouseEventFlags.MOUSEEVENTF_LEFTUP, 0, 0, 0, 0)
+        End Sub
+
+        ''' <summary>
         ''' 开启或者关闭默认浏览器webbrowser加载网页的提示音（嘟嘟声???）
         ''' </summary>
+        ''' <param name="browser"></param>
+        ''' <param name="disable">使能</param>
+        ''' <returns></returns>
         <Extension()>
         Public Function DisableNavigationSounds(ByRef browser As WebBrowser, ByVal disable As Boolean) As Integer
             Return CoInternetSetFeatureEnabled(INTERNETFEATURELIST.FEATURE_DISABLE_NAVIGATION_SOUNDS, SET_FEATURE_ON_PROCESS, disable)
@@ -147,7 +208,6 @@ Namespace ShanXingTech
                 Logger.WriteLine(ex)
             End Try
         End Sub
-
 
         ''' <summary>
         ''' KeyValue形式的cookie字符串转换成Cookie并存入CookieContainer。
@@ -416,6 +476,85 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
+        ''' 设置cookies到 <paramref name="web"/>
+        ''' </summary>
+        ''' <param name="cookieKeyValuePairs"></param>
+        ''' <param name="url">要浏览的链接（domain 从此链接获取）</param>
+        <Extension()>
+        Public Sub SetCookies(ByRef web As WebBrowser, ByVal cookieKeyValuePairs As String， ByVal url As String)
+            ' ##########################20170330########################
+            ' 获取传入的domain的根域名（主域名）
+            ' 如https://myseller.taobao.com，根域名是.taobao.com
+            ' 暂时没有找到方法确定某个cookie所属的domain，暂时设定为传入url的根域名
+            ' ##########################20170704########################
+            Dim domain = Net2.NetHelper.GetRootDomain(url)
+
+            Dim cookieKeyValuePairArray As String() = cookieKeyValuePairs.Split({";"}, StringSplitOptions.RemoveEmptyEntries)
+            Dim name As String
+            Dim value As String
+
+            For Each cookieKeyValuePair In cookieKeyValuePairArray
+                Dim equalSymbolPostion = cookieKeyValuePair.IndexOf("="c)
+                ' 有些cookie只有key而没有value,此处需要特殊处理
+                If equalSymbolPostion = -1 Then
+                    name = cookieKeyValuePair.Trim()
+                    value = String.Empty
+                Else
+                    name = cookieKeyValuePair.Substring(0, equalSymbolPostion).Trim()
+                    value = cookieKeyValuePair.Substring(equalSymbolPostion + "=".Length).Trim()
+#Region "注意信息"
+                    ' 有时候会有比较奇怪的cookie，比如1688的某一个cookie
+                    ' $Version=1; _tmp_ck_0="pcJxPh5%2B7lEEYZ%2F5hRcrgIj5hksWozhFCoqTDNHQYbf6Jp2qnuz1d3QVBrGnlupaIw1Nx0lGykurR5oci3YKyX9ReiC8%2F%2Bv9Wisk4H9dS75FnxfcRBFap7lOuoBa26wFBwqHNLOAJeBtEDez%2B%2BLNEJZm7g93D4Yhf9PBHuVTfh3fLZZP9hVIv5TalkceJi3emEE1Z3%2BB61cypPReOmMHlwWCXUWwmbHgH5NHI1BX%2FPlkbuw28EsX6iS%2BZ40N6XXDjFRWa8dH%2FIDK%2FviOP6oEUS%2Bm%2FvZ92hGMaXsYZt0yIQGlntd6eNZAE9Xq0ckLMCOPbH9JoHRpFABUrTnQxH5VetwAsOCYKcnMNzcLShnC%2BnWkqtre1BUm2CwD48qK0O0taq6gm0BzL1w%3D"; $Path=/; $Domain=.1688.com
+                    ' 获取的时候我们自取 
+                    ' name = _tmp_ck_0
+                    ' value = pcJxPh5%2B7lEEYZ%2F5hRcrgIj5hksWozhFCoqTDNHQYbf6Jp2qnuz1d3QVBrGnlupaIw1Nx0lGykurR5oci3YKyX9ReiC8%2F%2Bv9Wisk4H9dS75FnxfcRBFap7lOuoBa26wFBwqHNLOAJeBtEDez%2B%2BLNEJZm7g93D4Yhf9PBHuVTfh3fLZZP9hVIv5TalkceJi3emEE1Z3%2BB61cypPReOmMHlwWCXUWwmbHgH5NHI1BX%2FPlkbuw28EsX6iS%2BZ40N6XXDjFRWa8dH%2FIDK%2FviOP6oEUS%2Bm%2FvZ92hGMaXsYZt0yIQGlntd6eNZAE9Xq0ckLMCOPbH9JoHRpFABUrTnQxH5VetwAsOCYKcnMNzcLShnC%2BnWkqtre1BUm2CwD48qK0O0taq6gm0BzL1w%3D
+#End Region
+
+                    ' 去掉开头 和 后面的 所有 "
+                    While value.StartsWith("""")
+                        value = value.Remove(0, 1)
+                    End While
+
+                    While value.EndsWith("""")
+                        value = value.Remove(value.Length - 1, 1)
+                    End While
+                End If
+
+                ' Cookie 的值。value 参数不能包含分号 (;) 或逗号 (,)，除非它们包含在转义的双引号中。
+                ' 有时候有些cookie比较特殊，导致无法成功添加进去
+                ' 比如 百度网盘上传的cookie中有一个键值队为Hm_lvt_7a3960b6f067eb0085b7f96ff5e660b0=1503060813,1503309277,1503577240,1503654236
+                ' 后面的值有逗号会导致无法添加
+                If value.IndexOf(",") > -1 Then
+                    value = value.Replace(",", "%2C")
+                End If
+                If value.IndexOf(";") > -1 Then
+                    value = value.Replace(",", "%3B")
+                End If
+
+                Dim ck As New Cookie(name， value) With {
+                    .Domain = domain
+                }
+                InternetSetCookie(url, Nothing, ck.ToString)
+            Next
+        End Sub
+
+        ''' <summary>
+        ''' 从 <paramref name="web"/> 中获取完整 cookie（包括具有HttpOnly属性的cookie）。注：web.Document.Cookie 不包含具有HttpOnly属性的Cookie
+        ''' </summary>
+        ''' <param name="web"></param>
+        ''' <returns></returns>
+        <Extension()>
+        Public Function GetCookies(ByRef web As WebBrowser) As String
+
+            If web?.Document Is Nothing Then Return String.Empty
+
+            Dim cookie2 As Net.CookieContainer
+            cookie2.GetFromKeyValuePairs(web.Document.Cookie, web.Url.AbsoluteUri)
+            cookie2.GetFromUrl(web.Url.AbsoluteUri)
+            Return cookie2.ToKeyValuePairs
+        End Function
+
+        ''' <summary>
         ''' 更改程序内部IE浏览器默认的版本号（IE7）为 <paramref name="browserEmulationMode"/>
         ''' <para>需要重新打开程序更改才会生效</para>
         ''' </summary>
@@ -466,11 +605,10 @@ Namespace ShanXingTech
             '    *      This option cannot be queried with InternetQueryOption. 
             '    *      
             '    * INTERNET_SUPPRESS_COOKIE_PERSIST (3):
-            '    *      Suppresses the persistence of m_Cookies, even if the server has specified them as persistent.
+            '    *      Suppresses the persistence of Cookies, even if the server has specified them as persistent.
             '    *      Version:  Requires Internet Explorer 8.0 or later.
             '    
 
-            ' 禁止Cookie保留，也就是每个窗口具有独立Cookie
             Dim lpBuffer = New IntPtr(behavior)
             Dim success = InternetSetOption(IntPtr.Zero, INTERNET_OPTION_SUPPRESS_BEHAVIOR, lpBuffer, Marshal.SizeOf(behavior.GetType))
             IntPtrFree(lpBuffer)
@@ -479,15 +617,24 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' <see cref="WebBrowser"/> 执行JavaScript并返回结果
+        ''' 通过执行js清理cookie
         ''' </summary>
-        ''' <param name="webBrowser"></param>
+        ''' <param name="browser"></param>
+        <Extension()>
+        Public Sub DeleteCookiesByJs(ByRef browser As WebBrowser)
+            browser.Navigate("javascript:void((function(){var a,b,c,e,f;f=0;a=document.cookie.split('; ');for(e=0;e<a.length&&a[e];e++){f++;for(b='.'+location.host;b;b=b.replace(/^(?:%5C.|[^%5C.]+)/,'')){for(c=location.pathname;c;c=c.replace(/.$/,'')){document.cookie=(a[e]+'; domain='+b+'; path='+c+'; expires='+new Date((new Date()).getTime()-1e11).toGMTString());}}}})())")
+        End Sub
+
+        ''' <summary>
+        ''' <see cref="HtmlDocument"/> 执行JavaScript并返回结果
+        ''' </summary>
+        ''' <param name="doc"></param>
         ''' <param name="js">完整的js函数实现</param>
         ''' <param name="jsFuncName"><paramref name="js"/> 中函数的名称</param>
         ''' <returns></returns>
         <Extension()>
-        Public Function RunJs(ByRef webBrowser As WebBrowser, ByVal js As String, ByVal jsFuncName As String) As Object
-            If webBrowser?.Document Is Nothing Then Return Nothing
+        Public Function RunJavaScript(ByRef doc As HtmlDocument, ByVal js As String, ByVal jsFuncName As String) As Object
+            If doc Is Nothing Then Return Nothing
 
             If js.IsNullOrEmpty Then
                 Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(js)))
@@ -497,7 +644,7 @@ Namespace ShanXingTech
                 Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(jsFuncName)))
             End If
 
-            Dim script = webBrowser.Document.CreateElement("script")
+            Dim script = doc.CreateElement("script")
             If script Is Nothing Then Return Nothing
 
             script.SetAttribute("type", "text/javascript")
@@ -506,7 +653,7 @@ Namespace ShanXingTech
 
             ' 函数名做id,不重复添加
             Dim existsChildren As Boolean
-            For Each element2 As HtmlElement In webBrowser.Document.Body.Children.AsParallel
+            For Each element2 As HtmlElement In doc.Body.Children.AsParallel
                 If jsFuncName = element2.Id Then
                     existsChildren = True
                     Exit For
@@ -514,29 +661,66 @@ Namespace ShanXingTech
             Next
 
             If Not existsChildren Then
-                Dim element = webBrowser.Document.Body.AppendChild(script)
+                Dim element = doc.Body.AppendChild(script)
                 If element Is Nothing Then Return Nothing
             End If
 
-            Return webBrowser.Document.InvokeScript(jsFuncName)
+            Return doc.InvokeScript(jsFuncName)
         End Function
 
         ''' <summary>
-        ''' <see cref="WebBrowser"/> 执行JavaScript并返回结果
+        ''' <see cref="HtmlDocument"/> 执行JavaScript并返回结果
         ''' </summary>
-        ''' <param name="webBrowser"></param>
-        ''' <param name="jsFuncName">Html页面中JS函数的名称，如果此函数不在Html页面中，请使用 <seealso cref="RunJs(ByRef WebBrowser, String, String)"/> 。
-        ''' <para>注：如果是全局函数或属性，使用 ‘window.函数名()’ 或 ‘‘window.属性名’’ 方式无效，此时可以尝试使用套娃方式，利用 <see cref="RunJs(ByRef WebBrowser, String, String)"/>间接调用。比如 RunJs("自定义函数名","function 自定义函数名(){return window.json_ua.toString()}")</para></param>
+        ''' <param name="doc"></param>
+        ''' <param name="jsFuncName">Html页面中JS函数的名称，如果此函数不在Html页面中，请使用 <seealso cref="RunJavaScript(ByRef HtmlDocument, String, String)"/> 。
+        ''' <para>注：如果是全局函数或属性，使用 ‘window.函数名()’ 或 ‘‘window.属性名’’ 方式无效，此时可以尝试使用套娃方式，利用 <see cref="RunJavaScript(ByRef HtmlDocument, String, String)"/>间接调用。比如 RunJavaScript("自定义函数名","function 自定义函数名(){return window.json_ua.toString()}")</para></param>
         ''' <returns></returns>
         <Extension()>
-        Public Function RunJs(ByRef webBrowser As WebBrowser, ByVal jsFuncName As String) As Object
-            If webBrowser?.Document Is Nothing Then Return Nothing
+        Public Function RunJavaScript(ByRef doc As HtmlDocument, ByVal jsFuncName As String) As Object
+            If doc Is Nothing Then Return Nothing
 
             If jsFuncName.IsNullOrEmpty Then
                 Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(jsFuncName)))
             End If
 
-            Return webBrowser.Document.InvokeScript(jsFuncName)
+            Return doc.InvokeScript(jsFuncName)
+        End Function
+
+        ''' <summary>
+        ''' 向 <see cref="HtmlDocument"/> 中添加JavaScript
+        ''' </summary>
+        ''' <param name="doc"></param>
+        ''' <param name="js">完整的js函数实现。示例：window.confirm = function () {return true;}</param>
+        ''' <param name="jsId"><paramref name="js"/> 中函数的唯一标识符</param>
+        ''' <returns></returns>
+        <Extension()>
+        Public Function AttachJavaScript(ByRef doc As HtmlDocument, ByVal js As String, ByVal jsId As String) As Boolean
+            If doc Is Nothing Then Return Nothing
+
+            If js.IsNullOrEmpty Then
+                Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(js)))
+            End If
+
+            If jsId.IsNullOrEmpty Then
+                Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(jsId)))
+            End If
+
+            Dim script = doc.CreateElement("script")
+            If script Is Nothing Then Return False
+
+            script.SetAttribute("type", "text/javascript")
+            script.SetAttribute("id", jsId)
+            script.SetAttribute("text", js)
+
+            ' id,不重复添加
+            For Each element2 As HtmlElement In doc.Body.Children.AsParallel
+                If jsId = element2.Id Then
+                    Return True
+                End If
+            Next
+
+            Dim element = doc.Body.AppendChild(script)
+            Return element IsNot Nothing
         End Function
 
         ''' <summary>
@@ -581,21 +765,21 @@ Namespace ShanXingTech
 
             ' 如果强求头里面包含 m_Cookies ,那么就抛出异常，提示用户使用 Init 或者 ReInit方法传入 m_Cookies
             If requestHeaders.ContainsKey("cookie") Then
-                    Throw New NotSupportedException("不支持传入Cookie，请使用 Init 或者 ReInit方法设置Cookies")
+                Throw New NotSupportedException("不支持传入Cookie，请使用 Init 或者 ReInit方法设置Cookies")
+            End If
+
+            Dim keys = requestHeaders.Keys.ToArray
+            For Each key In keys
+                ' Post时不应该在此处设置content-type请求头
+                If method = Net2.HttpMethod.POST AndAlso key.Equals("content-type", StringComparison.OrdinalIgnoreCase) Then
+                    Continue For
                 End If
 
-                Dim keys = requestHeaders.Keys.ToArray
-                For Each key In keys
-                    ' Post时不应该在此处设置content-type请求头
-                    If method = Net2.HttpMethod.POST AndAlso key.Equals("content-type", StringComparison.OrdinalIgnoreCase) Then
-                        Continue For
-                    End If
-
-                    ' 没有这个请求头时才添加
-                    If Not requestMessage.Headers.Contains(key) Then
-                        requestMessage.Headers.TryAddWithoutValidation(key, requestHeaders(key))
-                    End If
-                Next
+                ' 没有这个请求头时才添加
+                If Not requestMessage.Headers.Contains(key) Then
+                    requestMessage.Headers.TryAddWithoutValidation(key, requestHeaders(key))
+                End If
+            Next
             'For Each header In requestHeaders
             '                ' Post时不应该在此处设置content-type请求头
             '                If method = Net2.HttpMethod.POST AndAlso header.Key.Equals("content-type", StringComparison.OrdinalIgnoreCase) Then
@@ -616,7 +800,7 @@ Namespace ShanXingTech
         ''' <param name="browser"></param>
         ''' <returns></returns>
         <Extension()>
-        Public Function GetBrowserReallyHwnd(ByRef browser As WebBrowser) As IntPtr
+        Public Function GetBrowserTrueHwnd(ByRef browser As WebBrowser) As IntPtr
             ' 方法一
             'Dim sbClassName As New StringBuilder(256)
             'Dim childHandle = GetWindow(browser.Handle, WindowType.GW_CHILD)

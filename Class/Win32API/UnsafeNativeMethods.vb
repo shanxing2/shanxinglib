@@ -66,6 +66,16 @@ Namespace ShanXingTech.Win32API
 		Public Function InternetGetCookieEx(pchURL As String, pchCookieName As String, pchCookieData As StringBuilder, ByRef pcchCookieData As Integer, dwFlags As Integer, lpReserved As IntPtr) As Boolean
 		End Function
 
+		''' <summary>
+		''' 设置Cookies
+		''' </summary>
+		''' <param name="lpszUrlName"></param>
+		''' <param name="lbszCookieName"></param>
+		''' <param name="lpszCookieData"></param>
+		''' <returns></returns>
+		<DllImport(ExternDll.Wininet, CharSet:=CharSet.Auto, SetLastError:=True)>
+		Public Function InternetSetCookie(lpszUrlName As String, lbszCookieName As String, lpszCookieData As String) As Boolean
+		End Function
 
 		<DllImport(ExternDll.Urlmon, CharSet:=CharSet.Ansi)>
 		Public Function UrlMkSetSessionOption(dwOption As Integer, pBuffer As String, dwBufferLength As Integer, dwReserved As Integer) As Integer

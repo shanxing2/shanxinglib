@@ -36,7 +36,7 @@ Namespace ShanXingTech
 #End Region
 
         ''' <summary>
-        ''' 16进制字符串转换为直接数组
+        ''' 16进制（数）字符串转换为直接数组
         ''' </summary>
         ''' <param name="hexString"></param>
         ''' <returns></returns>
@@ -50,7 +50,7 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 16进制字符串转换为字节数组
+        ''' 16进制（数）字符串转换为字节数组
         ''' </summary>
         ''' <param name="hexString"></param>
         ''' <param name="containDoubleByte"><paramref name="hexString"/>源是否包含双字节字符</param>
@@ -74,7 +74,7 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 16进制字符串转换为字节数组。默认把<paramref name="hexString"/>当做全部由单字节字符组成的字符串来处理
+        ''' 16进制（数）字符串转换为字节数组。默认把<paramref name="hexString"/>当做全部由单字节字符组成的字符串来处理
         ''' </summary>
         ''' <param name="hexString"></param>
         ''' <returns></returns>
@@ -84,10 +84,10 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 原始字符串转换为16进制字符串
+        ''' 原始字符串转换为16进制（数）字符串
         ''' </summary>
         ''' <param name="sourceString"></param>
-        ''' <param name="lUCase">生成大写或者小写形式的16进制字符串</param>
+        ''' <param name="lUCase">生成大写或者小写形式的16进制（数）字符串</param>
         ''' <param name="containDoubleByte"><paramref name="sourceString"/>是否包含双字节字符串</param>
         ''' <returns></returns>
         <Extension()>
@@ -96,10 +96,10 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 原始字符串转换为16进制字符串。默认把<paramref name="sourceString"/>当做全部由单字节字符组成的字符串来处理
+        ''' 原始字符串转换为16进制（数）字符串。默认把<paramref name="sourceString"/>当做全部由单字节字符组成的字符串来处理
         ''' </summary>
         ''' <param name="sourceString"></param>
-        ''' <param name="lUCase">生成大写或者小写形式的16进制字符串</param>
+        ''' <param name="lUCase">生成大写或者小写形式的16进制（数）字符串</param>
         ''' <returns></returns>
         <Extension()>
         Public Function ToHexString(ByVal sourceString As String, ByVal lUCase As UpperLowerCase) As String
@@ -107,7 +107,7 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 16进制字符串转换为原始字符串，如果包含非16进制字符将截断返回
+        ''' 16进制（数）字符串转换为原始字符串，如果包含非16进制字符将截断返回
         ''' </summary>
         ''' <param name="sourceString"></param>
         ''' <param name="containDoubleByte"><paramref name="sourceString"/>是否包含双字节字符串</param>
@@ -150,7 +150,7 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 16进制字符串转换为原始字符串。默认把<paramref name="sourceString"/>当做全部由单字节字符组成的字符串来处理
+        ''' 16进制（数）字符串转换为原始字符串。默认把<paramref name="sourceString"/>当做全部由单字节字符组成的字符串来处理
         ''' </summary>
         ''' <param name="sourceString"></param>
         ''' <returns></returns>
@@ -322,10 +322,10 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' Byte类型数组转换为16进制字符串
+        ''' Byte类型数组转换为16进制（数）字符串
         ''' </summary>
         ''' <param name="sourceByte"></param>
-        ''' <param name="upperLowerCase">生成大写或者小写形式的16进制字符串</param>
+        ''' <param name="upperLowerCase">生成大写或者小写形式的16进制（数）字符串</param>
         ''' <returns></returns>
         <Extension()>
         Public Function ToHexString(ByVal sourceByte() As Byte, ByVal upperLowerCase As UpperLowerCase) As String
@@ -346,7 +346,7 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' Byte类型数组转换为16进制字符串小写形式
+        ''' Byte类型数组转换为16进制（数）字符串小写形式
         ''' </summary>
         ''' <param name="sourceByte"></param>
         ''' <returns></returns>
@@ -929,14 +929,13 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 字符串形式的键值对转换为集合。此函数与类库自带的函数 <see cref="Net.WebUtility.ParseQueryString"/> 不同，不需要提前编码；如果值域包含特殊字符如“=、+”等，类库自带的函数 <see cref="Net.WebUtility.ParseQueryString"/> 无法正常解析
+        ''' 字符串形式的键值对转换为集合。此函数与类库自带的函数 <see cref="Net.WebUtility.UrlDecode"/> 不同，不需要提前编码；如果值域包含特殊字符如“=、+”等，类库自带的函数 <see cref="Net.WebUtility.UrlDecode"/> 无法正常解析
         ''' </summary>
         ''' <param name="kvString"></param>
         ''' <param name="urlEncoded"><paramref name="kvString"/> 是否已经编码</param>
-        ''' <param name="encoding">指示 <paramref name="kvString"/> 采用的是何种编码，如果 <paramref name="kvString"/> 未编码，可传入 Nothing</param>
         ''' <returns></returns>
         <Extension()>
-        Public Function ToKeyValuePairs(kvString As String, urlEncoded As Boolean, encoding As Encoding) As IEnumerable(Of KeyValuePair(Of String, String))
+        Public Function ToKeyValuePairs(kvString As String, urlEncoded As Boolean) As IEnumerable(Of KeyValuePair(Of String, String))
             ' 如果已经编码过，那就先解码
             If urlEncoded Then kvString = Net.WebUtility.UrlDecode(kvString)
 
@@ -989,25 +988,14 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 字符串形式的键值对转换为集合。此函数与类库自带的函数 <see cref="Net.WebUtility.ParseQueryString"/> 不同，不需要提前编码；如果值域包含特殊字符如“=、+”等，类库自带的函数 <see cref="Net.WebUtility.ParseQueryString"/> 无法正常解析
-        ''' </summary>
-        ''' <param name="kvString"></param>
-        ''' <param name="urlEncoded"><paramref name="kvString"/> 是否已经编码</param>
-        ''' <returns></returns>
-        <Extension()>
-        Public Function ToKeyValuePairs(kvString As String, urlEncoded As Boolean) As IEnumerable(Of KeyValuePair(Of String, String))
-            Return ToKeyValuePairs(kvString, urlEncoded, Nothing)
-        End Function
-
-        ''' <summary>
-        ''' 字符串形式的键值对转换为集合。此函数与类库自带的函数 <see cref="Net.WebUtility.ParseQueryString"/> 不同，不需要提前编码；如果值域包含特殊字符如“=、+”等，类库自带的函数 <see cref="Net.WebUtility.ParseQueryString"/> 无法正常解析。
-        ''' <para>注：<paramref name="kvString"/> 必须是未执行过 <see cref="HttpUtility.UrlEncode(String, Encoding)"/> 的字符串</para>
+        ''' 字符串形式的键值对转换为集合。此函数与类库自带的函数 <see cref="Net.WebUtility.UrlDecode(String)"/> 不同，不需要提前编码；如果值域包含特殊字符如“=、+”等，类库自带的函数 <see cref="Net.WebUtility.UrlDecode"/> 无法正常解析。
+        ''' <para>注：<paramref name="kvString"/> 必须是未执行过 <see cref="Net.WebUtility.UrlEncode(String)"/> 的字符串</para>
         ''' </summary>
         ''' <param name="kvString"></param>
         ''' <returns></returns>
         <Extension()>
         Public Function ToKeyValuePairs(kvString As String) As IEnumerable(Of KeyValuePair(Of String, String))
-            Return ToKeyValuePairs(kvString, False, Nothing)
+            Return ToKeyValuePairs(kvString, False)
         End Function
 
         ''' <summary>
@@ -1086,7 +1074,7 @@ Namespace ShanXingTech
                 If instance Is Nothing Then Return String.Empty
 
                 Dim objType = instance.GetType
-                Dim filePath As String = $"{nameOfInstance}_{objType.Name}.bs"
+                Dim filePath As String = IO.Path.GetFullPath($"{nameOfInstance}_{objType.Name}.bs")
                 Using fs As New FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite)
                     Dim bf As New BinaryFormatter()
                     bf.Serialize(fs, instance)

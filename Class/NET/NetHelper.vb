@@ -166,7 +166,7 @@ Namespace ShanXingTech.Net2
         ''' </summary>
         ''' <param name="url">一个链接或者可以直接传入domain</param>
         ''' <returns>成功返回删除个数，失败或者没有相关cookies可以删除则返回0</returns>
-        Public Shared Function DeleteCookiesAboutDomain(ByVal url As String) As Integer
+        Public Shared Function DeleteCookiesByCookieFile(ByVal url As String) As Integer
             ' 通过传入的url获取根域名
             Dim domain = GetRootDomain(url)
 

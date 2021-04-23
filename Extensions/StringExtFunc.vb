@@ -374,7 +374,7 @@ Namespace ShanXingTech
 		End Function
 
         ''' <summary>
-        ''' 使用 <paramref name="encoding"/> 编码方式 将传入的字符串编码。默认的编码结果为小写形式。
+        '''  将传入的字符串编码，默认的编码结果为小写形式。详情请看 <see cref="Net.WebUtility.UrlEncode(String)"/>
         ''' </summary>
         ''' <param name="sourceString"></param>
         ''' <returns></returns>
@@ -384,10 +384,9 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
-        ''' 使用 <paramref name="encoding"/> 编码方式 将传入的字符串编码
+        ''' 将传入的字符串编码。详情请看 <see cref="Net.WebUtility.UrlEncode(String)"/>
         ''' </summary>
         ''' <param name="sourceString"></param>
-        ''' <param name="encoding"></param>
         ''' <param name="lUCase">编码结果为大写还是小写</param>
         ''' <returns></returns>
         <Extension()>
@@ -461,10 +460,9 @@ Namespace ShanXingTech
         'End Function
 
         ''' <summary>
-        ''' 使用name将传入的字符串解码
+        ''' 将传入的字符串解码。详情请看 <see cref="Net.WebUtility.UrlDecode(String)"/>
         ''' </summary>
         ''' <param name="sourceString"></param>
-        ''' <param name="encoding"></param>
         ''' <returns></returns>
         <Extension()>
         Public Function UrlDecode(ByVal sourceString As String) As String
