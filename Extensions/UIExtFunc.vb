@@ -1065,7 +1065,7 @@ Namespace ShanXingTech
         ''' <param name="columnIndex">需要排序的列</param>
         ''' <param name="dataSource">需要排序的数据源</param>
         <Extension()>
-        Public Sub TrySortByColumnHeader(Of T)(ByRef dgv As DataGridView, ByVal columnIndex As Integer, ByVal dataSource As IList(Of T))
+        Public Sub TrySortByColumnHeader(Of T)(ByRef dgv As DataGridView, ByVal columnIndex As Integer, ByVal dataSource As IEnumerable(Of T))
             Try
                 ' 循环使用排序
                 Dim colName = dgv.Columns(columnIndex).Name
@@ -1075,6 +1075,31 @@ Namespace ShanXingTech
                     dgv.Columns(colName).HeaderCell.SortGlyphDirection = SortOrder.Descending
                 Else
                     dgv.DataSource = dataSource.AsQueryable.OrderBy(dgv.Columns(columnIndex).Name).ToArray
+                    dgv.Columns(colName).HeaderCell.SortGlyphDirection = SortOrder.Ascending
+                End If
+            Catch ex As Exception
+                Logger.WriteLine(ex)
+            End Try
+        End Sub
+
+        ''' <summary>
+        ''' 以 列头 排序，并显示小三角。注：需要排序的列的 <see cref="DataGridViewColumn.SortMode"/> 不能为 <see cref="DataGridViewColumnSortMode.NotSortable"/>
+        ''' </summary>
+        ''' <typeparam name="T"></typeparam>
+        ''' <param name="dgv"><see cref="DataGridView"/>实例</param>
+        ''' <param name="columnNameInDataSource">需要排序的列名。注：列名指的是<paramref name="dgv"/>中的列对应数据源<paramref name="dataSource"/>的属性名，非列头显示的名称。</param>
+        ''' <param name="dataSource">需要排序的数据源</param>
+        <Extension()>
+        Public Sub TrySortByColumnHeader(Of T)(ByRef dgv As DataGridView, ByVal columnIndex As Integer, ByVal columnNameInDataSource As String, ByVal dataSource As IEnumerable(Of T))
+            Try
+                ' 循环使用排序
+                Dim colName = dgv.Columns(columnIndex).Name
+                If dgv.Columns(columnIndex).HeaderCell.SortGlyphDirection = SortOrder.Ascending Then
+                    dgv.DataSource = dataSource.AsQueryable.OrderByDescending(columnNameInDataSource).ToArray
+                    ' 不能使用index，上面排序后，index会变
+                    dgv.Columns(colName).HeaderCell.SortGlyphDirection = SortOrder.Descending
+                Else
+                    dgv.DataSource = dataSource.AsQueryable.OrderBy(columnNameInDataSource).ToArray
                     dgv.Columns(colName).HeaderCell.SortGlyphDirection = SortOrder.Ascending
                 End If
             Catch ex As Exception

@@ -2,12 +2,7 @@
 各种低效轮子(Various inefficient wheels)
 
 ## 框架版本 
-.NET 4.6.1
-
-## 引用
-### NuGet  
-1.Install-Package System.ValueTuple -Version 4.5.0  
-2.Install-Package Microsoft.AspNet.WebApi.Client -Version 5.2.7  
+.NET 4.8
 
 注：此Package依赖于Newtonsoft.Json，但是我们这个项目用不到，所以不需要也可以，可以在NuGet管理器中勾选 ‘强制卸载，即使有依赖项’，然后强制卸载依赖包Newtonsoft.Json。  
 ### 第三方库

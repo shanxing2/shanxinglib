@@ -29,8 +29,8 @@ Namespace ShanXingTech.IO2
             Try
                 ' 获取参数
                 sheetName = params.SheetName
-                txtPath = params.TxtCachePath
-                excelFileName = params.ExcelFileName
+                txtPath = IO.Path.GetFullPath(params.TxtCachePath)
+                excelFileName = IO.Path.GetFullPath(params.ExcelFileName）
 
                 ' 文件名不能包含特殊字符,否则不能导出
                 ' 特殊字符转换为 "asc值" 的形式，值 为相应的特殊字符asc值
@@ -144,14 +144,16 @@ Namespace ShanXingTech.IO2
                     ' 有些电脑会有“类 Workbook 的 SaveAs 方法无效”错误(wps和excel同时安装）
                     ' 去掉后面的FileFormat参数，然后根据当前wps或者excel版本号保存为相应的格式即可
                     ' 无论是excel或者wps，都是版本号为11以上的才默认保存为xlsx格式
-                    If ExcelEngine.Excel.Version > 11.0# Then
-                        excelFileName = excelFileName & ".xlsx"
-                    ElseIf ExcelEngine.Excel.Version <= 11.0# Then
-                        excelFileName = excelFileName & ".xls"
-                    End If
+                    Select Case ExcelEngine.Excel.Version
+                        Case Is > 11.0#
+                            excelFileName &= ".xlsx"
+                        Case Is <= 11.0#
+                            excelFileName &= ".xls"
+                    End Select
 
                     If System.IO.File.Exists(excelFileName) Then
                         ' 如果本地已经存在xlsFileName用SaveAs保存时会有提示
+                        ' 或者office未激活，Excel不可编辑，也有SaveAs提示
                         ' 屏蔽提示
                         ExcelEngine.Excel.Instance.DisplayAlerts = False
                         Call xlBook.SaveAs(excelFileName)
@@ -164,7 +166,6 @@ Namespace ShanXingTech.IO2
                     xlBook.save
                 End If
 
-
                 ' 导出成功,返回true
                 success = True
                 Debug.Print(Logger.MakeDebugString("保存完成"))
@@ -174,6 +175,7 @@ Namespace ShanXingTech.IO2
                 Logger.Debug(ex)
 
                 excelFileName = ex.Message
+                Throw
             Finally
                 If xlBook IsNot Nothing Then
                     ' 关闭提示是否保存提示框（不提示是否保存,直接保存文件）
@@ -289,15 +291,12 @@ Namespace ShanXingTech.IO2
                 End If
 
                 Dim convertOperate As (ExcelFileName As String, Success As Boolean) = Nothing
-                Task.Run(
-                Sub()
-                    convertOperate = Txt2Excel(excelFileInfo)
+                convertOperate = Txt2Excel(excelFileInfo)
 
-                    ' 删除缓存文件
-                    If System.IO.File.Exists(cacheTxtFilePath) Then
-                        System.IO.File.Delete(cacheTxtFilePath)
-                    End If
-                End Sub).GetAwaiter.GetResult()
+                ' 删除缓存文件
+                If System.IO.File.Exists(cacheTxtFilePath) Then
+                    System.IO.File.Delete(cacheTxtFilePath)
+                End If
 
                 ' 如果导出失败 会返回false
                 funcRst = convertOperate.Success

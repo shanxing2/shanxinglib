@@ -216,16 +216,32 @@ Namespace ShanXingTech.Net2
         ''' <param name="proxy">指示处理程序是否应设置代理信息,默认为Nothing</param>
         ''' <param name="charSet">解码响应文本使用的字符集，设置错误会导致乱码。设置之前，确保访问的每个网页的字符集都是一样的，否则建议使用无参数的构造函数，程序内部自动检查字符集，当然也会牺牲一点效率。</param>
         Private Sub InitInternal(ByVal cookies As CookieContainer, ByVal allowAutoRedirect As Boolean, ByRef proxy As IWebProxy, ByVal charSet As String)
+            InitInternal(cookies, allowAutoRedirect, proxy, Nothing, charSet)
+        End Sub
+
+        ''' <summary>
+        ''' 用于重新初始化类，比如更换账号等涉及到重新传入cookie的情况
+        ''' </summary>
+        ''' <param name="cookies">如果为Nothing，则只重新初始化类，不设置cookie</param>
+        ''' <param name="allowAutoRedirect">指示处理程序是否应跟随重定向响应,默认为True</param>
+        ''' <param name="proxy">指示处理程序是否应设置代理信息,默认为Nothing</param>
+        ''' <param name="charSet">解码响应文本使用的字符集，设置错误会导致乱码。设置之前，确保访问的每个网页的字符集都是一样的，否则建议使用无参数的构造函数，程序内部自动检查字符集，当然也会牺牲一点效率。</param>
+        Private Sub InitInternal(ByVal cookies As CookieContainer, ByVal allowAutoRedirect As Boolean, ByRef proxy As IWebProxy, ByVal credentials As NetworkCredential, ByVal charSet As String)
             DefaultCharSet = "GBK"
             m_DefaulTimeoutSpan = TimeSpan.FromSeconds(30)
             m_CharSet = charSet
 
             m_HttpClientHandler = New GBKCompatibleHanlder(charSet) With {
                 .UseProxy = proxy IsNot Nothing,
-                .Proxy = proxy,
                 .AutomaticDecompression = DecompressionMethods.GZip Or DecompressionMethods.Deflate,
                 .AllowAutoRedirect = allowAutoRedirect
             }
+            If m_HttpClientHandler.UseProxy Then
+                m_HttpClientHandler.UseDefaultCredentials = False
+                m_HttpClientHandler.Proxy = proxy
+                m_HttpClientHandler.Credentials = proxy.Credentials
+            End If
+
             ' 把传入的cookie装盒并且设置到请求头
             ' cookie只能是这样设置.而且httpClient内部会自动管理cookies
             ' 不能多次设置，只能是设置一次
@@ -301,6 +317,17 @@ Namespace ShanXingTech.Net2
         ''' <param name="port">要使用的 <paramref name="host"/> 上的端口号</param>
         Public Sub SetProxy(ByVal enabled As Boolean, ByVal host As String, ByVal port As Integer)
             InitInternal(Cookies, AllowAutoRedirect, If(enabled, New WebProxy(host, port), Nothing), m_CharSet)
+        End Sub
+
+
+        ''' <summary>
+        ''' 设置代理
+        ''' </summary>
+        ''' <param name="enabled">是否启用代理</param>
+        ''' <param name="host">代理主机的名称</param>
+        ''' <param name="port">要使用的 <paramref name="host"/> 上的端口号</param>
+        Public Sub SetProxy(ByVal enabled As Boolean, ByVal host As String, ByVal port As Integer, ByVal credential As NetworkCredential)
+            InitInternal(Cookies, AllowAutoRedirect, If(enabled, New WebProxy(host, port), Nothing), credential, m_CharSet)
         End Sub
 
         ''' <summary>
@@ -418,7 +445,7 @@ Namespace ShanXingTech.Net2
         Private Async Function ReadAsStringAsync(ByVal response As HttpResponseMessage) As Task(Of String)
             ' 修复 ReadAsStringAsync 引发异常 “utf8”不是支持的编码名。有关定义自定义编码的信息，请参阅关于 Encoding.RegisterProvider 方法的文档 
             ' 某些网页不规范，charset设置的是 charset=UTF8 而不是 charset=UTF-8，20200327
-            Dim charset = response.Content.Headers.ContentType.CharSet
+            Dim charset = response.Content.Headers.ContentType?.CharSet
             If "utf8".Equals(charset, StringComparison.OrdinalIgnoreCase) Then
                 response.Content.Headers.ContentType.CharSet = "utf-8"
             End If
@@ -456,6 +483,22 @@ Namespace ShanXingTech.Net2
                 httpResponse = New HttpResponse(False, HttpStatusCode.BadRequest, ex.Message)
             Catch ex As TaskCanceledException
                 httpResponse = New HttpResponse(False, HttpStatusCode.RequestTimeout, ex.Message)
+            Catch ex As HttpRequestException
+                If ex.InnerException IsNot Nothing Then
+                    Dim webEx = TryCast(ex.InnerException, WebException)
+                    If webEx IsNot Nothing Then
+                        If webEx.Status = WebExceptionStatus.ProtocolError Then
+                            Dim httpWebResponse = TryCast(webEx.Response, HttpWebResponse)
+                            httpResponse = New HttpResponse(False, httpWebResponse.StatusCode, httpWebResponse.StatusDescription)
+                        Else
+                            httpResponse = New HttpResponse(False, HttpStatusCode.BadRequest, webEx.Message)
+                        End If
+                    Else
+                        httpResponse = New HttpResponse(False, HttpStatusCode.BadRequest, ex.InnerException.Message)
+                    End If
+                Else
+                    httpResponse = New HttpResponse(False, HttpStatusCode.BadRequest, ex.ToString)
+                End If
             Catch ex As Exception
                 httpResponse = If(ex.InnerException IsNot Nothing,
                     New HttpResponse(False, HttpStatusCode.BadRequest, ex.InnerException.Message),

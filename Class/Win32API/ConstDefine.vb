@@ -25,6 +25,10 @@
         Public Const INTERNET_SUPPRESS_COOKIE_PERSIST As Integer = 3
         Public Const INTERNET_SUPPRESS_COOKIE_PERSIST_RESET As Integer = 4
         Public Const INTERNET_OPTION_END_BROWSER_SESSION As Integer = 42
+        Public Const INTERNET_OPTION_CONNECTED_STATE = 50
+        Public Const INTERNET_STATE_DISCONNECTED_BY_USER = &H10
+        Public Const ISO_FORCE_DISCONNECTED = &H1
+        Public Const INTERNET_STATE_CONNECTED = &H1
         Public Const WM_CLOSE = &H10
         Public Const WM_CLICK = &HF5
         Public Const WM_COPYDATA As Integer = &H4A

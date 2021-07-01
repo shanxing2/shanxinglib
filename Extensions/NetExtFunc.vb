@@ -617,12 +617,32 @@ Namespace ShanXingTech
         End Function
 
         ''' <summary>
+        ''' 清除<paramref name="browser"/>的Session
+        ''' </summary>
+        ''' <param name="browser"></param>
+        <Extension()>
+        Public Function ClearSession(ByRef browser As WebBrowser) As Boolean
+            Return InternetSetOption(IntPtr.Zero, INTERNET_OPTION_END_BROWSER_SESSION, IntPtr.Zero, 0)
+        End Function
+
+        ''' <summary>
         ''' 通过执行js清理cookie
         ''' </summary>
         ''' <param name="browser"></param>
         <Extension()>
         Public Sub DeleteCookiesByJs(ByRef browser As WebBrowser)
             browser.Navigate("javascript:void((function(){var a,b,c,e,f;f=0;a=document.cookie.split('; ');for(e=0;e<a.length&&a[e];e++){f++;for(b='.'+location.host;b;b=b.replace(/^(?:%5C.|[^%5C.]+)/,'')){for(c=location.pathname;c;c=c.replace(/.$/,'')){document.cookie=(a[e]+'; domain='+b+'; path='+c+'; expires='+new Date((new Date()).getTime()-1e11).toGMTString());}}}})())")
+        End Sub
+
+        ''' <summary>
+        ''' 删除<paramref name="browser"/>当前domain有关的所有cookies 
+        ''' </summary>
+        ''' <param name="browser"></param>
+        <Extension()>
+        Public Sub DeleteCookiesByCookieFile(ByRef browser As WebBrowser)
+            Dim url = browser?.Url?.AbsoluteUri
+            If url.IsNullOrEmpty Then Throw New ArgumentNullException(String.Format(My.Resources.NullReference， NameOf(browser.Url.AbsoluteUri)))
+            Net2.NetHelper.DeleteCookiesByCookieFile(url)
         End Sub
 
         ''' <summary>
